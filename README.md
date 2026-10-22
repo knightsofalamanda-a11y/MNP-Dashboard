@@ -1,6 +1,6 @@
 # MNP Dashboard: Konsolidasi Kargo KTI
 
-Prototipe dashboard Solusi 1 (Monitoring End-to-End) untuk case competition Makassar New Port. Halaman statis satu berkas (`index.html`), tanpa proses build.
+Prototipe dashboard Solusi 1 (Monitoring End-to-End) untuk case competition Makassar New Port. Halaman statis satu berkas (`public/index.html`), tanpa proses build. Dideploy sebagai Cloudflare Worker dengan static assets (lihat `wrangler.jsonc`).
 
 ## Isi
 - Ringkasan KPI, tren TEU mingguan, dan peringatan aktif
@@ -9,10 +9,10 @@ Prototipe dashboard Solusi 1 (Monitoring End-to-End) untuk case competition Maka
 - Tracker truk dan feeder terhadap cut-off direct call
 - Proyeksi tiga skenario dan simulator ambang direct call
 
-## Deploy ke Cloudflare Pages
-1. Cloudflare dashboard, Workers & Pages, Create, Pages, Connect to Git.
-2. Pilih repo ini, branch `main`.
-3. Framework preset `None`, build command dikosongkan, output directory `/`.
-4. Save and Deploy. Setiap push ke `main` akan ter-deploy otomatis.
+## Deploy ke Cloudflare
+1. Cloudflare dashboard, Workers & Pages, Create, Import a repository.
+2. Pilih repo ini. Project name `mnp-dashboard`.
+3. Build command dikosongkan. Deploy command `npx wrangler deploy`.
+4. Deploy. Setiap push ke `main` akan ter-deploy otomatis.
 
 Seluruh angka, nama partner, dan status kemitraan bersifat ilustratif.
