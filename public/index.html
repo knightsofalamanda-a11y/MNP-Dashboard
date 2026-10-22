@@ -3,41 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>KTI Consolidation Monitor</title>
+<title>MNP Control Tower</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 [hidden]{display:none!important}
 html{color-scheme:light}
 body{margin:0}
 img{max-width:100%}
 /* Layout: harbor control room. Sticky header with cut-off countdown, tab bar, then a 12-col grid per view. */
+/* Layout: port operations portal. Navy hero banner, white module cards by role, light single theme (white and navy by request). */
 :root{
-  --bg:#EDF1F0; --surface:#FFFFFF; --surface2:#F5F8F7; --land:#DCE4E1; --sea:#E9F0F1;
-  --ink:#13211F; --muted:#5A6A67; --line:#D3DCDA;
-  --accent:#0E6A80; --accent-soft:rgba(14,106,128,.12);
-  --good:#2F7A4E; --warn:#A8700E; --bad:#B4382E; --idle:#7D8B88;
-  --good-soft:rgba(47,122,78,.13); --warn-soft:rgba(168,112,14,.15); --bad-soft:rgba(180,56,46,.13);
-  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
-  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --bg:#F3F6FB; --surface:#FFFFFF; --surface2:#F4F7FC; --land:#DCE4F1; --sea:#EEF3FA;
+  --ink:#14213F; --muted:#5D6A83; --line:#DFE5EF;
+  --navy:#1A2B5C; --navy2:#22377A; --on-navy:#FFFFFF; --on-navy-muted:#C5D0EA;
+  --accent:#2453C9; --accent-soft:rgba(36,83,201,.10);
+  --coral:#C9473F; --teal:#4FA88F;
+  --good:#2E8559; --warn:#B26F12; --bad:#C0392B; --idle:#7A8599;
+  --good-soft:rgba(46,133,89,.12); --warn-soft:rgba(178,111,18,.13); --bad-soft:rgba(192,57,43,.11);
+  --f-display:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
-  --r:10px;
+  --r:14px;
+  color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0C1514; --surface:#13201E; --surface2:#182725; --land:#22332F; --sea:#101C1B;
-  --ink:#E2EBE9; --muted:#93A5A1; --line:#2A3B38;
-  --accent:#4FB3C9; --accent-soft:rgba(79,179,201,.16);
-  --good:#5CB883; --warn:#E0A23A; --bad:#E5675B; --idle:#7F918D;
-  --good-soft:rgba(92,184,131,.16); --warn-soft:rgba(224,162,58,.17); --bad-soft:rgba(229,103,91,.16);
-  color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0C1514; --surface:#13201E; --surface2:#182725; --land:#22332F; --sea:#101C1B;
-  --ink:#E2EBE9; --muted:#93A5A1; --line:#2A3B38;
-  --accent:#4FB3C9; --accent-soft:rgba(79,179,201,.16);
-  --good:#5CB883; --warn:#E0A23A; --bad:#E5675B; --idle:#7F918D;
-  --good-soft:rgba(92,184,131,.16); --warn-soft:rgba(224,162,58,.17); --bad-soft:rgba(229,103,91,.16);
-  color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
@@ -174,6 +164,79 @@ select{background:var(--surface2);border:1px solid var(--line);border-radius:6px
 .seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
 footer{padding-block:0 32px;color:var(--muted);font-size:12px}
 footer p{margin:0;max-width:90ch}
+
+/* ===== Portal restyle ===== */
+body{background:var(--bg)}
+a{color:inherit}
+header.top{background:var(--surface);border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgba(20,33,63,.02)}
+.brand{flex-direction:row;align-items:center;gap:10px;text-decoration:none}
+.mark{width:34px;height:24px;flex:none}
+.brand-name{font-weight:700;font-size:17px;color:var(--navy);letter-spacing:-.01em}
+.top-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cutoff{padding:6px 12px;border-radius:12px;gap:10px}
+.cutoff .lbl{font-size:11.5px}
+.clock{font-family:var(--f-mono);font-size:17px;font-weight:500;color:var(--navy)}
+.role-chip{appearance:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 13px var(--f-body);padding:8px 12px;border-radius:999px;cursor:pointer}
+.role-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--teal)}
+.role-chip .chg{color:var(--accent);font-weight:600;border-left:1px solid var(--line);padding-left:8px}
+.role-chip:hover{border-color:var(--accent)}
+.tab{font-weight:600}
+.tab[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--coral)}
+.panel{border-radius:var(--r);box-shadow:0 1px 2px rgba(20,33,63,.04)}
+.panel h2{font-weight:700;font-size:17px;color:var(--navy);letter-spacing:-.01em}
+.kpi{border-radius:12px}
+.kpi .v{font-size:27px;font-weight:700;letter-spacing:-.02em}
+.dl dd{font-size:19px;font-weight:700}
+.callout .big,.verdict .big{font-size:24px;font-weight:700;letter-spacing:-.01em}
+.detail h3{font-size:20px;font-weight:700;color:var(--navy)}
+h1{font-weight:800}
+.thesis{background:var(--navy);border-color:var(--navy);color:var(--on-navy)}
+.thesis .pill{background:rgba(255,255,255,.12);color:var(--on-navy)}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+/* hero */
+.portal{gap:18px}
+.hero{grid-column:span 12;position:relative;overflow:hidden;background:var(--navy);color:var(--on-navy);border-radius:28px;padding:44px 52px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:center;min-height:250px;box-shadow:0 18px 40px -24px rgba(26,43,92,.55)}
+.hero::after{content:"";position:absolute;right:-80px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.07),transparent 65%);pointer-events:none}
+.hero-eyebrow{font-size:13px;font-weight:600;color:var(--on-navy-muted)}
+.hero h1{font-size:clamp(28px,4vw,44px);line-height:1.08;letter-spacing:-.025em;margin:10px 0 8px;color:#fff}
+.hero-sub{margin:0;font-size:18px;color:var(--on-navy-muted)}
+.hero-art{display:flex;justify-content:center}
+.hero-art svg{width:100%;max-width:400px;height:auto}
+.hero-strip{position:absolute;left:52px;bottom:0;width:112px;height:6px;background:linear-gradient(90deg,var(--coral) 50%,var(--teal) 50%)}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.hero-stats div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:8px 14px;min-width:0}
+.hero-stats b{display:block;font-size:20px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+.hero-stats span{font-size:12px;color:var(--on-navy-muted)}
+@media (max-width:820px){.hero{grid-template-columns:1fr;padding:32px 24px 36px}.hero-art{order:-1;justify-content:flex-start}.hero-art svg{max-width:260px}.hero-strip{left:24px}}
+.sec-head{grid-column:span 12;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-top:10px}
+.sec-title{margin:0;font-size:19px;font-weight:700;color:var(--navy);letter-spacing:-.01em}
+.sec-note{font-size:13px;color:var(--muted)}
+.sub-head{grid-column:span 12;display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;color:var(--navy)}
+.sub-head i{width:22px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--coral) 50%,var(--teal) 50%)}
+.cards{grid-column:span 12;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+@media (max-width:980px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.cards{grid-template-columns:1fr}}
+.cards.roles{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1100px){.cards.roles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.cards.roles{grid-template-columns:1fr}}
+.card{appearance:none;text-align:left;font:inherit;color:inherit;background:var(--surface);border:1px solid #CFD7E4;border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;min-width:0}
+.card:hover{transform:translateY(-2px);box-shadow:0 14px 30px -18px rgba(26,43,92,.45);border-color:var(--accent)}
+.card.soon{cursor:default;background:linear-gradient(var(--surface),var(--surface2))}
+.card.soon:hover{transform:none;box-shadow:none;border-color:#CFD7E4}
+.card .ill{border-radius:14px;background:linear-gradient(135deg,var(--tint,#FBEFEF),#FAFBFD);height:140px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden}
+.card .ill svg{height:118px;width:auto;max-width:100%}
+.card .ct{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.card .ct b{font-size:19px;font-weight:700;color:var(--navy);letter-spacing:-.01em}
+.card .ct small{font-size:13px;color:var(--muted)}
+.card .tag{font-size:12.5px;font-weight:700;color:var(--coral)}
+.card.soon .tag{color:var(--muted)}
+.card .desc{color:var(--muted);font-size:14px}
+.card .go{margin-top:10px;font-weight:700;font-size:14px;color:var(--coral)}
+.card.soon .go{color:var(--muted)}
+.card.role .ill{height:110px}
+.card.role .ill svg{height:88px}
+.crumb{grid-column:span 12;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.crumb button{appearance:none;border:0;background:none;color:var(--accent);font:600 13px var(--f-body);cursor:pointer;padding:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -183,16 +246,20 @@ footer p{margin:0;max-width:90ch}
 <header class="top">
   <div class="wrap">
     <div class="top-row">
-      <div class="brand">
-        <span class="eyebrow">Solusi 1 · Monitoring End-to-End · Makassar New Port</span>
-        <h1>Dashboard Konsolidasi Kargo KTI</h1>
-      </div>
-      <div class="cutoff" aria-live="polite">
-        <div class="lbl">Cut-off direct call berikutnya<br><b id="cutoffDate">memuat</b></div>
-        <div class="clock" id="clock">--:--:--</div>
+      <a class="brand" href="#beranda" id="brandLink" aria-label="Kembali ke beranda">
+        <svg class="mark" viewBox="0 0 34 24" aria-hidden="true"><rect x="0" y="12" width="10" height="10" rx="2" fill="var(--navy)"/><rect x="12" y="12" width="10" height="10" rx="2" fill="var(--accent)"/><rect x="24" y="12" width="10" height="10" rx="2" fill="var(--teal)"/><rect x="6" y="1" width="10" height="10" rx="2" fill="var(--coral)"/><rect x="18" y="1" width="10" height="10" rx="2" fill="var(--navy2)"/></svg>
+        <span class="brand-name">MNP Control Tower</span>
+      </a>
+      <div class="top-tools">
+        <div class="cutoff" aria-live="polite" title="Cut-off direct call berikutnya">
+          <div class="lbl">Cut-off direct call<br><b id="cutoffDate">memuat</b></div>
+          <div class="clock" id="clock">--</div>
+        </div>
+        <button class="role-chip" id="roleChip" hidden><span class="dot"></span><span id="roleName">Peran</span><span class="chg">Ganti</span></button>
       </div>
     </div>
-    <nav class="tabs" role="tablist" aria-label="Bagian dashboard">
+    <nav class="tabs" role="tablist" aria-label="Modul" id="modNav" hidden>
+      <button class="tab" role="tab" data-v="beranda" id="t-beranda">Beranda</button>
       <button class="tab" role="tab" data-v="ringkasan" id="t-ringkasan">Ringkasan</button>
       <button class="tab" role="tab" data-v="jaringan" id="t-jaringan">Jaringan Konsolidasi</button>
       <button class="tab" role="tab" data-v="partner" id="t-partner">Partner</button>
@@ -203,11 +270,42 @@ footer p{margin:0;max-width:90ch}
 </header>
 
 <main class="wrap">
+  <!-- PILIH PERAN -->
+  <section class="view portal" data-view="peran" hidden>
+    <div class="hero">
+      <div class="hero-text">
+        <span class="hero-eyebrow">Solusi 1 · Monitoring End-to-End</span>
+        <h1>Dashboard Konsolidasi Kargo KTI</h1>
+        <p class="hero-sub">Makassar New Port</p>
+      </div>
+      <div class="hero-art" id="heroArt1"></div>
+      <i class="hero-strip" aria-hidden="true"></i>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Pilih peran Anda</h2><span class="sec-note">Modul yang tampil menyesuaikan peran</span></div>
+    <div class="cards roles" id="roleCards"></div>
+  </section>
+
+  <!-- BERANDA -->
+  <section class="view portal" data-view="beranda" hidden>
+    <div class="hero">
+      <div class="hero-text">
+        <span class="hero-eyebrow" id="heroRole">Peran</span>
+        <h1>Dashboard Konsolidasi Kargo KTI</h1>
+        <p class="hero-sub">Makassar New Port</p>
+        <div class="hero-stats" id="heroStats"></div>
+      </div>
+      <div class="hero-art" id="heroArt2"></div>
+      <i class="hero-strip" aria-hidden="true"></i>
+    </div>
+    <div class="sec-head"><h2 class="sec-title">Modul operasional</h2><span class="sec-note" id="secNote"></span></div>
+    <div class="sub-head"><i></i><span id="roleGroup">Peran</span></div>
+    <div class="cards" id="modCards"></div>
+  </section>
   <!-- RINGKASAN -->
   <section class="view" data-view="ringkasan">
     <div class="thesis panel">
       <p>Volume terkonsolidasi minggu ini <b id="thVol">480 TEU</b>, atau <b id="thPct">84%</b> dari ambang kelayakan direct call. Pada skenario moderat, ambang terlampaui pada <b id="thYear">2027</b>.</p>
-      <span class="pill p-idle">Data ilustratif · minggu ke-43 2026</span>
+      <span class="pill">Data ilustratif · minggu ke-43 2026</span>
     </div>
     <div class="kpis" id="kpis"></div>
     <div class="panel c7">
@@ -427,7 +525,7 @@ const hoursToCut=()=>(CUT-new Date())/3600e3;
 function tick(){
   let ms=CUT-new Date(); if(ms<=0){CUT=nextCutoff();ms=CUT-new Date();renderFleet();renderAlerts();}
   const h=Math.floor(ms/3600e3),m=Math.floor(ms%3600e3/60e3),s=Math.floor(ms%60e3/1e3);
-  $("#clock").textContent=`${h}j ${String(m).padStart(2,"0")}m ${String(s).padStart(2,"0")}d`;
+  $("#clock").textContent=`${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
 }
 function renderCutLabel(){
   const f=new Intl.DateTimeFormat("id-ID",{weekday:"long",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Makassar"});
@@ -641,27 +739,83 @@ function readSim(){
 }
 function onSim(){readSim();renderKPIs();renderWhatIf();const T=chartTheme();if(T){drawTrend(T);drawProj(T);drawBE(T)}}
 
-/* ================= TABS ================= */
-const VIEWS=["ringkasan","jaringan","partner","armada","proyeksi"];
-function show(v){ if(!VIEWS.includes(v)) v="ringkasan";
+/* ================= PORTAL ================= */
+const ILL={
+ ringkasan:{tint:"#EEF2FB",svg:`<svg viewBox="0 0 220 120"><ellipse cx="110" cy="110" rx="80" ry="6" fill="#DCE3F1"/><path d="M40 104V20" stroke="#8A97B3" stroke-width="2"/><path d="M40 104h130" stroke="#8A97B3" stroke-width="2"/><rect x="56" y="78" width="18" height="26" rx="3" fill="#97A8D6"/><rect x="82" y="64" width="18" height="40" rx="3" fill="#5E7BC8"/><rect x="108" y="44" width="18" height="60" rx="3" fill="#1A2B5C"/><path d="M58 70 L92 56 L118 36 L150 28" fill="none" stroke="#C9473F" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 6"/><circle cx="168" cy="40" r="22" fill="none" stroke="#97A8D6" stroke-width="3"/><circle cx="168" cy="40" r="13" fill="none" stroke="#97A8D6" stroke-width="3"/><circle cx="168" cy="40" r="4" fill="#C9473F"/></svg>`},
+ jaringan:{tint:"#ECF5F2",svg:`<svg viewBox="0 0 220 120"><ellipse cx="110" cy="110" rx="84" ry="6" fill="#D6E7E1"/><path d="M60 30 C80 30 90 50 108 62 M168 28 C150 40 140 52 118 64 M150 94 C138 86 128 76 116 70 M48 86 C70 84 88 78 106 70" fill="none" stroke="#2453C9" stroke-width="2.5" stroke-dasharray="1 6" stroke-linecap="round"/><circle cx="60" cy="30" r="9" fill="#4FA88F"/><circle cx="168" cy="28" r="7" fill="#4FA88F"/><circle cx="150" cy="94" r="8" fill="#B26F12"/><circle cx="48" cy="86" r="6" fill="#4FA88F"/><rect x="100" y="56" width="22" height="22" rx="4" transform="rotate(45 111 67)" fill="#1A2B5C"/><path d="M111 22 v-12 m0 0 l-5 6 m5-6 l5 6" stroke="#C9473F" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`},
+ partner:{tint:"#FBEFEF",svg:`<svg viewBox="0 0 220 120"><ellipse cx="110" cy="110" rx="80" ry="6" fill="#EFD9D9"/><rect x="40" y="22" width="80" height="84" rx="6" fill="#E6D6D8"/><rect x="50" y="14" width="80" height="88" rx="6" fill="#fff" stroke="#8A97B3" stroke-width="2"/><path d="M62 34h52M62 46h52M62 58h36" stroke="#8A97B3" stroke-width="3" stroke-linecap="round"/><circle cx="74" cy="82" r="8" fill="#CFE6DD"/><path d="M140 66 l14 -14 a8 8 0 0 1 11 0 l6 6 a8 8 0 0 1 0 11 l-14 14 z" fill="#1A2B5C"/><path d="M128 92 l18 -18 10 10 -18 18 z" fill="#C9473F"/><path d="M122 100h40" stroke="#C9473F" stroke-width="4" stroke-linecap="round"/></svg>`},
+ armada:{tint:"#FBF2E6",svg:`<svg viewBox="0 0 220 120"><ellipse cx="110" cy="110" rx="88" ry="6" fill="#F0E2CF"/><path d="M20 98h180" stroke="#C9B79C" stroke-width="2" stroke-dasharray="8 6"/><rect x="34" y="50" width="86" height="40" rx="4" fill="#2453C9"/><path d="M48 50v40M62 50v40M76 50v40M90 50v40M104 50v40" stroke="#1A2B5C" stroke-width="2" opacity=".5"/><path d="M120 62h26l16 16v12h-42z" fill="#1A2B5C"/><rect x="132" y="66" width="14" height="10" rx="2" fill="#C5D0EA"/><circle cx="56" cy="94" r="8" fill="#14213F"/><circle cx="56" cy="94" r="3" fill="#fff"/><circle cx="140" cy="94" r="8" fill="#14213F"/><circle cx="140" cy="94" r="3" fill="#fff"/><path d="M178 22a14 14 0 0 1 14 14c0 11-14 24-14 24s-14-13-14-24a14 14 0 0 1 14-14z" fill="#C9473F"/><circle cx="178" cy="36" r="5" fill="#fff"/></svg>`},
+ proyeksi:{tint:"#EEF2FB",svg:`<svg viewBox="0 0 220 120"><ellipse cx="110" cy="110" rx="80" ry="6" fill="#DCE3F1"/><path d="M34 100 C70 92 100 70 186 26 L186 64 C120 84 80 96 34 100z" fill="#C5D0EA" opacity=".8"/><path d="M34 100 C76 90 110 70 186 44" fill="none" stroke="#1A2B5C" stroke-width="3.5" stroke-linecap="round"/><path d="M30 62h162" stroke="#C9473F" stroke-width="2.5" stroke-dasharray="6 5"/><circle cx="128" cy="62" r="7" fill="#fff" stroke="#C9473F" stroke-width="3"/><rect x="40" y="18" width="60" height="22" rx="11" fill="#fff" stroke="#97A8D6" stroke-width="2"/><circle cx="74" cy="29" r="7" fill="#2453C9"/></svg>`},
+ soon:{tint:"#F1F3F7",svg:`<svg viewBox="0 0 220 120"><ellipse cx="110" cy="110" rx="70" ry="6" fill="#E1E5EC"/><rect x="62" y="24" width="96" height="76" rx="10" fill="#fff" stroke="#B9C2D3" stroke-width="2" stroke-dasharray="5 5"/><circle cx="110" cy="62" r="18" fill="none" stroke="#B9C2D3" stroke-width="3"/><path d="M110 52v11l7 5" stroke="#8A97B3" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`}
+};
+const ROLE_ILL={
+ manajemen:`<svg viewBox="0 0 160 100"><ellipse cx="80" cy="94" rx="56" ry="5" fill="#DCE3F1"/><rect x="34" y="20" width="92" height="64" rx="8" fill="#fff" stroke="#8A97B3" stroke-width="2"/><rect x="46" y="56" width="12" height="18" rx="2" fill="#97A8D6"/><rect x="64" y="46" width="12" height="28" rx="2" fill="#5E7BC8"/><rect x="82" y="34" width="12" height="40" rx="2" fill="#1A2B5C"/><path d="M102 60l8-8 8 8" stroke="#C9473F" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+ operator:`<svg viewBox="0 0 160 100"><ellipse cx="80" cy="94" rx="60" ry="5" fill="#DCE3F1"/><path d="M50 88V20h46" stroke="#1A2B5C" stroke-width="5" fill="none"/><path d="M50 30l20-10" stroke="#1A2B5C" stroke-width="3"/><path d="M92 20v26" stroke="#8A97B3" stroke-width="2"/><rect x="80" y="46" width="26" height="14" rx="2" fill="#C9473F"/><rect x="96" y="70" width="34" height="18" rx="2" fill="#2453C9"/><rect x="60" y="70" width="34" height="18" rx="2" fill="#4FA88F"/></svg>`,
+ koordinator:`<svg viewBox="0 0 160 100"><ellipse cx="80" cy="94" rx="58" ry="5" fill="#D6E7E1"/><path d="M36 50l44-26 44 26v38H36z" fill="#fff" stroke="#8A97B3" stroke-width="2"/><rect x="62" y="58" width="36" height="30" fill="#ECF5F2" stroke="#8A97B3" stroke-width="2"/><rect x="66" y="66" width="28" height="10" rx="1" fill="#4FA88F"/><rect x="66" y="78" width="28" height="8" rx="1" fill="#2453C9"/><circle cx="80" cy="40" r="5" fill="#C9473F"/></svg>`,
+ partner:`<svg viewBox="0 0 160 100"><ellipse cx="80" cy="94" rx="58" ry="5" fill="#EFD9D9"/><circle cx="56" cy="40" r="14" fill="#1A2B5C"/><path d="M32 84c2-16 12-24 24-24s22 8 24 24z" fill="#1A2B5C"/><circle cx="104" cy="40" r="14" fill="#C9473F"/><path d="M80 84c2-16 12-24 24-24s22 8 24 24z" fill="#C9473F"/><path d="M66 72h28" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>`
+};
+const HERO_ART=`<svg viewBox="0 0 400 220" aria-hidden="true"><ellipse cx="200" cy="200" rx="150" ry="14" fill="#13214A"/><path d="M120 196V60h120" stroke="#fff" stroke-width="7" fill="none" opacity=".92"/><path d="M120 76l40-16" stroke="#fff" stroke-width="4" opacity=".7"/><path d="M226 60v44" stroke="#C5D0EA" stroke-width="2"/><rect x="206" y="104" width="40" height="22" rx="3" fill="#C9473F"/><g><rect x="150" y="150" width="56" height="22" rx="3" fill="#4FA88F"/><rect x="208" y="150" width="56" height="22" rx="3" fill="#2453C9"/><rect x="179" y="126" width="56" height="22" rx="3" fill="#E7ECF7"/><rect x="150" y="174" width="56" height="22" rx="3" fill="#E7ECF7"/><rect x="208" y="174" width="56" height="22" rx="3" fill="#C9473F"/></g><g transform="translate(36 26)"><rect width="58" height="58" rx="14" fill="#fff"/><path d="M14 40l9-13 9 7 12-17" stroke="#2453C9" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g><g transform="translate(300 24)"><rect width="58" height="58" rx="14" fill="#DDEFE8"/><path d="M29 12a12 12 0 0 1 12 12c0 10-12 21-12 21S17 34 17 24a12 12 0 0 1 12-12z" fill="#2E8559"/><circle cx="29" cy="24" r="4" fill="#DDEFE8"/></g><g transform="translate(312 120)"><rect width="52" height="52" rx="14" fill="#fff"/><path d="M14 18h24M14 26h24M14 34h14" stroke="#1A2B5C" stroke-width="3.5" stroke-linecap="round"/></g><g transform="translate(40 120)"><circle cx="26" cy="26" r="26" fill="#F6DDDB"/><path d="M16 36V24M24 36V16M32 36V22" stroke="#C9473F" stroke-width="5" stroke-linecap="round"/></g><path d="M94 55h26M300 53h-60M312 146h-48M92 146h56" stroke="#7F90C4" stroke-width="2" stroke-dasharray="5 6"/></svg>`;
+const MODS={
+ ringkasan:{t:"Ringkasan Eksekutif",sub:"KPI",d:"Enam KPI mingguan, tren volume, dan peringatan aktif",tag:()=>`${fmt(CALL.teuWeek)} TEU minggu ini`},
+ jaringan:{t:"Jaringan Konsolidasi",sub:"Peta",d:"Koridor laut dan darat, kinerja tiap hub",tag:()=>`${NODES.length} titik KTI`},
+ partner:{t:"Partner",sub:"Kemitraan",d:"Pipeline, scorecard, dan heatmap komitmen",tag:()=>`${PARTNERS.length} partner`},
+ armada:{t:"Tracker Armada",sub:"Truk & feeder",d:"Posisi unit dan risiko terhadap cut-off",tag:()=>`${FLEET.filter(u=>u.st!=="ARRIVED_MNP").length} unit aktif`},
+ proyeksi:{t:"Proyeksi & Direct Call",sub:"Simulasi",d:"Tiga skenario volume dan titik impas",tag:()=>`ambang ${fmt(threshold())} TEU/minggu`},
+ laporan:{t:"Laporan Bulanan",sub:"Ekspor",d:"Ringkasan kinerja untuk rapat direksi",soon:true},
+ dermaga:{t:"Perencanaan Dermaga",sub:"Berth",d:"Alokasi tambatan untuk direct call",soon:true},
+ slot:{t:"Booking Slot Kontainer",sub:"Konsolidasi",d:"Pesan ruang muat pada feeder terjadwal",soon:true},
+ dokumen:{t:"Dokumen & Bea Cukai",sub:"Kepatuhan",d:"Status PEB, karantina, dan SLA jalur prioritas",soon:true}
+};
+const ROLES={
+ manajemen:{nama:"Manajemen MNP",grup:"Manajemen & Komersial",d:"Kinerja konsolidasi, partner, dan kelayakan direct call",mods:["ringkasan","proyeksi","partner","jaringan","armada","laporan"]},
+ operator:{nama:"Operator Terminal MNP",grup:"Operasi Terminal",d:"Kedatangan armada dan kesiapan cut-off",mods:["armada","jaringan","ringkasan","dermaga"]},
+ koordinator:{nama:"Koordinator Titik Konsolidasi",grup:"Hub Konsolidasi KTI",d:"Kinerja hub, dwell, dan unit yang berangkat",mods:["jaringan","armada","slot"]},
+ partner:{nama:"Partner (Shipper & Carrier)",grup:"Shipper & Carrier",d:"Komitmen volume dan peluang direct call",mods:["partner","proyeksi","slot","dokumen"]}
+};
+const MODVIEWS=["ringkasan","jaringan","partner","armada","proyeksi"];
+let role=null; try{role=localStorage.getItem("mnp-role")}catch(e){} if(!ROLES[role]) role=null;
+
+function renderRoleCards(){
+  $("#roleCards").innerHTML=Object.entries(ROLES).map(([k,r])=>`<button class="card role" data-role="${k}" style="--tint:${k==="partner"?"#FBEFEF":k==="koordinator"?"#ECF5F2":"#EEF2FB"}"><div class="ill">${ROLE_ILL[k]}</div><div class="ct"><b>${r.nama}</b></div><span class="tag">${r.mods.filter(m=>!MODS[m].soon).length} modul</span><span class="desc">${r.d}</span><span class="go">Masuk sebagai peran ini ›</span></button>`).join("");
+  $("#roleCards").querySelectorAll(".card").forEach(b=>b.addEventListener("click",()=>setRole(b.dataset.role)));
+}
+function renderPortal(){
+  const r=ROLES[role]; if(!r) return;
+  $("#roleName").textContent=r.nama; $("#heroRole").textContent="Masuk sebagai "+r.nama;
+  $("#roleGroup").textContent=r.grup; $("#secNote").textContent=r.mods.filter(m=>!MODS[m].soon).length+" modul aktif · data ilustratif";
+  const th=threshold(); const risk=buildAlerts().filter(a=>a.sev==="bad").length;
+  $("#heroStats").innerHTML=`<div><b>${fmt(CALL.teuWeek)} TEU</b><span>terkonsolidasi minggu ini</span></div><div><b>${Math.round(CALL.teuWeek/th*100)}%</b><span>dari ambang direct call</span></div><div><b>${risk}</b><span>peringatan kritis</span></div>`;
+  $("#modCards").innerHTML=r.mods.map(m=>{const M=MODS[m];const il=M.soon?ILL.soon:ILL[m];
+    return `<${M.soon?"div":"button"} class="card${M.soon?" soon":""}" ${M.soon?"":`data-go="${m}"`} style="--tint:${il.tint}"><div class="ill">${il.svg}</div><div class="ct"><b>${M.t}</b><small>${M.sub}</small></div><span class="tag">${M.soon?"Tahap berikutnya":M.tag()}</span><span class="desc">${M.d}</span><span class="go">${M.soon?"Coming Soon":"Buka modul ›"}</span></${M.soon?"div":"button"}>`}).join("");
+  $("#modCards").querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.go)));
+  document.querySelectorAll("#modNav .tab").forEach(t=>{t.hidden=t.dataset.v!=="beranda"&&!r.mods.includes(t.dataset.v)});
+}
+function setRole(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();show("beranda")}
+function show(v){
+  if(!role) v="peran";
+  if(!["peran","beranda",...MODVIEWS].includes(v)) v="beranda";
   document.querySelectorAll(".view").forEach(s=>s.hidden=s.dataset.view!==v);
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.v===v));
+  $("#modNav").hidden=v==="peran"; $("#roleChip").hidden=!role||v==="peran";
   try{history.replaceState(null,"","#"+v)}catch(e){}
   try{localStorage.setItem("kti-tab",v)}catch(e){}
+  if(v==="beranda") renderPortal();
+  window.scrollTo(0,0);
   Object.values(charts).forEach(c=>c.resize());
 }
 document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>show(t.dataset.v)));
+$("#roleChip").addEventListener("click",()=>show("peran"));
+$("#brandLink").addEventListener("click",e=>{e.preventDefault();show(role?"beranda":"peran")});
 $("#scenSeg").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{scen=b.dataset.s;$("#scenSeg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));const T=chartTheme();if(T)drawProj(T)}));
 ["sVol","sCall","sSave"].forEach(id=>$("#"+id).addEventListener("input",onSim));
 
 /* ================= INIT ================= */
+$("#heroArt1").innerHTML=HERO_ART; $("#heroArt2").innerHTML=HERO_ART;
 renderCutLabel(); tick(); setInterval(tick,1000);
-readSim(); renderKPIs(); renderNodeTables(); drawMap(); renderPartners(); renderFleet(); renderAlerts();
+readSim(); renderKPIs(); renderNodeTables(); drawMap(); renderPartners(); renderFleet(); renderAlerts(); renderRoleCards(); renderPortal();
 let start=(location.hash||"").slice(1); if(!start){try{start=localStorage.getItem("kti-tab")||""}catch(e){}}
-show(start||"ringkasan");
+show(start||"beranda");
 drawAll();
-matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>setTimeout(drawAll,50));
-new MutationObserver(()=>setTimeout(drawAll,50)).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 })();
 </script>
 
