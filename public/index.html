@@ -288,19 +288,6 @@ h1{font-weight:800}
     <div class="cards roles" id="roleCards"></div>
   </section>
 
-  <!-- BANNER PERAN (tampil di modul pertama tiap peran) -->
-  <section class="view-hero" id="roleHero" hidden>
-    <div class="hero">
-      <div class="hero-text">
-        <span class="hero-eyebrow" id="heroRole">Peran</span>
-        <h1>Dashboard Konsolidasi Kargo KTI</h1>
-        <p class="hero-sub">Makassar New Port</p>
-        <div class="hero-stats" id="heroStats"></div>
-      </div>
-      <div class="hero-art" id="heroArt2"></div>
-      <i class="hero-strip" aria-hidden="true"></i>
-    </div>
-  </section>
   <!-- RINGKASAN -->
   <section class="view" data-view="ringkasan">
     <div class="thesis panel">
@@ -781,9 +768,7 @@ function renderRoleCards(){
 }
 function renderPortal(){
   const r=ROLES[role]; if(!r) return;
-  $("#roleName").textContent=r.nama; $("#heroRole").textContent="Masuk sebagai "+r.nama;
-  const th=threshold(); const risk=buildAlerts().filter(a=>a.sev==="bad").length;
-  $("#heroStats").innerHTML=`<div><b>${fmt(CALL.teuWeek)} TEU</b><span>terkonsolidasi minggu ini</span></div><div><b>${Math.round(CALL.teuWeek/th*100)}%</b><span>dari ambang direct call</span></div><div><b>${risk}</b><span>peringatan kritis</span></div>`;
+  $("#roleName").textContent=r.nama;
   $("#soonTabs").innerHTML=r.mods.filter(m=>MODS[m].soon).map(m=>`<span class="soon-tab" title="${MODS[m].d}">${MODS[m].t}<em>Segera</em></span>`).join("");
   document.querySelectorAll("#modNav .tab").forEach(t=>{t.hidden=!r.mods.includes(t.dataset.v)});
 }
@@ -791,14 +776,14 @@ const firstMod=()=>ROLES[role].mods.find(m=>!MODS[m].soon);
 function setRole(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();show(firstMod())}
 function show(v){
   if(!role) v="peran";
-  if(role&&(v==="beranda"||!ROLES[role].mods.includes(v))) v=firstMod();
+  if(role&&v!=="peran"&&!ROLES[role].mods.includes(v)) v=firstMod();
   if(!["peran",...MODVIEWS].includes(v)) v="peran";
   document.querySelectorAll(".view").forEach(s=>s.hidden=s.dataset.view!==v);
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.v===v));
   $("#modNav").hidden=v==="peran"; $("#roleChip").hidden=!role||v==="peran";
   try{history.replaceState(null,"","#"+v)}catch(e){}
   try{localStorage.setItem("kti-tab",v)}catch(e){}
-  $("#roleHero").hidden=!(role&&v===firstMod()); if(!$("#roleHero").hidden) renderPortal();
+
   window.scrollTo(0,0);
   Object.values(charts).forEach(c=>c.resize());
 }
@@ -809,7 +794,7 @@ $("#scenSeg").querySelectorAll("button").forEach(b=>b.addEventListener("click",(
 ["sVol","sCall","sSave"].forEach(id=>$("#"+id).addEventListener("input",onSim));
 
 /* ================= INIT ================= */
-$("#heroArt1").innerHTML=HERO_ART; $("#heroArt2").innerHTML=HERO_ART;
+$("#heroArt1").innerHTML=HERO_ART;
 renderCutLabel(); tick(); setInterval(tick,1000);
 readSim(); renderKPIs(); renderNodeTables(); drawMap(); renderPartners(); renderFleet(); renderAlerts(); renderRoleCards(); renderPortal();
 let start=(location.hash||"").slice(1); if(!start){try{start=localStorage.getItem("kti-tab")||""}catch(e){}}
