@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KTI Consolidation Monitor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+[hidden]{display:none!important}
+html{color-scheme:light}
+body{margin:0}
+img{max-width:100%}
+/* Layout: harbor control room. Sticky header with cut-off countdown, tab bar, then a 12-col grid per view. */
+:root{
+  --bg:#EDF1F0; --surface:#FFFFFF; --surface2:#F5F8F7; --land:#DCE4E1; --sea:#E9F0F1;
+  --ink:#13211F; --muted:#5A6A67; --line:#D3DCDA;
+  --accent:#0E6A80; --accent-soft:rgba(14,106,128,.12);
+  --good:#2F7A4E; --warn:#A8700E; --bad:#B4382E; --idle:#7D8B88;
+  --good-soft:rgba(47,122,78,.13); --warn-soft:rgba(168,112,14,.15); --bad-soft:rgba(180,56,46,.13);
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1514; --surface:#13201E; --surface2:#182725; --land:#22332F; --sea:#101C1B;
+  --ink:#E2EBE9; --muted:#93A5A1; --line:#2A3B38;
+  --accent:#4FB3C9; --accent-soft:rgba(79,179,201,.16);
+  --good:#5CB883; --warn:#E0A23A; --bad:#E5675B; --idle:#7F918D;
+  --good-soft:rgba(92,184,131,.16); --warn-soft:rgba(224,162,58,.17); --bad-soft:rgba(229,103,91,.16);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C1514; --surface:#13201E; --surface2:#182725; --land:#22332F; --sea:#101C1B;
+  --ink:#E2EBE9; --muted:#93A5A1; --line:#2A3B38;
+  --accent:#4FB3C9; --accent-soft:rgba(79,179,201,.16);
+  --good:#5CB883; --warn:#E0A23A; --bad:#E5675B; --idle:#7F918D;
+  --good-soft:rgba(92,184,131,.16); --warn-soft:rgba(224,162,58,.17); --bad-soft:rgba(229,103,91,.16);
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1360px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;padding-block:14px 10px}
+.brand{display:flex;flex-direction:column;gap:2px;min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:600;font-size:26px;line-height:1.1;margin:0;letter-spacing:.01em;text-wrap:balance}
+.cutoff{display:flex;align-items:center;gap:14px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r);padding:8px 14px}
+.cutoff .lbl{font-size:12px;color:var(--muted);line-height:1.3}
+.cutoff .lbl b{color:var(--ink);font-weight:600}
+.clock{font-family:var(--f-display);font-size:28px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--accent);line-height:1}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab{appearance:none;border:0;background:none;color:var(--muted);font:500 14px var(--f-body);padding:10px 12px 12px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{padding-block:20px 40px}
+.view{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.panel h2{font-family:var(--f-display);font-weight:600;font-size:19px;margin:0 0 2px;letter-spacing:.01em}
+.panel .sub{color:var(--muted);font-size:12.5px;margin:0 0 14px}
+.c12{grid-column:span 12}.c8{grid-column:span 8}.c7{grid-column:span 7}.c6{grid-column:span 6}.c5{grid-column:span 5}.c4{grid-column:span 4}
+@media (max-width:980px){.c8,.c7,.c6,.c5,.c4{grid-column:span 12}}
+.thesis{grid-column:span 12;display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline;justify-content:space-between}
+.thesis p{margin:0;font-size:15px;max-width:72ch}
+.thesis p b{font-weight:600}
+.kpis{grid-column:span 12;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:560px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--st,var(--line))}
+.kpi .k{font-size:12px;color:var(--muted);line-height:1.3}
+.kpi .v{font-family:var(--f-display);font-size:32px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:15px;font-weight:500;color:var(--muted);margin-left:3px}
+.kpi .t{font-size:11.5px;color:var(--muted);font-family:var(--f-mono)}
+.bar{height:5px;border-radius:3px;background:var(--surface2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--st,var(--accent));border-radius:3px}
+.chart-box{position:relative;height:260px}
+.chart-box.tall{height:330px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;padding:2px 8px;border-radius:999px;white-space:nowrap;font-family:var(--f-mono);letter-spacing:.02em}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.p-good{color:var(--good);background:var(--good-soft)}
+.p-warn{color:var(--warn);background:var(--warn-soft)}
+.p-bad{color:var(--bad);background:var(--bad-soft)}
+.p-info{color:var(--accent);background:var(--accent-soft)}
+.p-idle{color:var(--idle);background:var(--surface2)}
+.alerts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.alerts li{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;padding:10px 12px;border-radius:8px;background:var(--surface2);border-left:3px solid var(--sev)}
+.alerts .what{font-weight:500}
+.alerts .act{grid-column:2;color:var(--muted);font-size:12.5px}
+.tbl-wrap{overflow-x:auto;margin:0 -4px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:500;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;padding:8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--f-mono);font-size:12.5px}
+tbody tr.clickable{cursor:pointer}
+tbody tr.clickable:hover td{background:var(--surface2)}
+tbody tr.sel td{background:var(--accent-soft)}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono);font-size:12.5px}
+/* map */
+.map-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px}
+@media (max-width:860px){.map-grid{grid-template-columns:1fr}}
+svg.map{width:100%;height:auto;display:block;background:var(--sea);border-radius:8px}
+.map .land{fill:var(--land);stroke:var(--line);stroke-width:1}
+.map .grid line{stroke:var(--line);stroke-width:.6;stroke-dasharray:2 4}
+.map .grid text{fill:var(--muted);font:10px var(--f-mono)}
+.map .route{fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:.75}
+.map .route.sea{stroke:var(--accent);stroke-dasharray:1 6}
+.map .route.road{stroke:var(--warn)}
+.map .route.hi{opacity:1}
+.map .route.dim{opacity:.18}
+.map .node{cursor:pointer}
+.map .node circle.dot{stroke:var(--surface);stroke-width:2}
+.map .node text{font:500 11px var(--f-body);fill:var(--ink);paint-order:stroke;stroke:var(--sea);stroke-width:3px}
+.map .node:focus-visible circle.dot{stroke:var(--ink)}
+.map .mnp rect{fill:var(--ink)}
+.map .mnp text{font:600 12px var(--f-display);fill:var(--ink);letter-spacing:.04em;paint-order:stroke;stroke:var(--sea);stroke-width:3px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:22px;height:0;border-top:3px solid var(--accent)}
+.sw.sea{border-top:3px dotted var(--accent)}
+.sw.road{border-top-color:var(--warn)}
+.detail{display:flex;flex-direction:column;gap:12px}
+.detail h3{font-family:var(--f-display);font-size:22px;font-weight:600;margin:0;line-height:1.1}
+.dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dl div{background:var(--surface2);border-radius:8px;padding:8px 10px}
+.dl dt{font-size:11.5px;color:var(--muted)}
+.dl dd{margin:0;font-family:var(--f-display);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.dl dd small{font-size:13px;color:var(--muted);font-weight:500;margin-left:2px}
+/* partner */
+.funnel{display:flex;flex-direction:column;gap:6px}
+.frow{display:grid;grid-template-columns:120px minmax(0,1fr) 70px;gap:10px;align-items:center;font-size:13px}
+.frow .fb{height:22px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.frow .fb i{display:block;height:100%;background:var(--accent);opacity:var(--o,1);border-radius:4px}
+.frow .n{font-family:var(--f-mono);font-size:12px;text-align:right;color:var(--muted)}
+.heat td.h{text-align:center;font-family:var(--f-mono);font-size:11.5px;min-width:52px;border-left:2px solid var(--surface)}
+.heat td.h.na{color:var(--muted)}
+.stage{display:inline-flex;gap:3px}
+.stage i{width:12px;height:6px;border-radius:2px;background:var(--line)}
+.stage i.on{background:var(--accent)}
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:12px}
+select,input[type=range]{font:inherit;color:var(--ink)}
+select{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:6px 10px;max-width:100%}
+.callout{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:baseline;padding:12px 14px;border-radius:8px;background:var(--surface2)}
+.callout .big{font-family:var(--f-display);font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+/* fleet */
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--f-mono);font-size:11px}
+.flow span{padding:3px 7px;border-radius:4px;background:var(--surface2);color:var(--muted);position:relative}
+.flow span.on{background:var(--accent-soft);color:var(--accent);font-weight:500}
+.flow b{color:var(--line);font-weight:400}
+.prog{width:110px;height:6px;border-radius:3px;background:var(--surface2);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--st,var(--accent))}
+.unit{font-weight:500}
+.unit small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.chip{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:500 12.5px var(--f-body);padding:5px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+/* sim */
+.sliders{display:grid;gap:14px}
+.sl label{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:4px}
+.sl label output{font-family:var(--f-mono);font-size:12.5px;color:var(--accent);font-weight:500}
+.sl input{width:100%;accent-color:var(--accent)}
+.sl .hint{font-size:11.5px;color:var(--muted)}
+.verdict{border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:4px;border:1px solid var(--line)}
+.verdict .big{font-family:var(--f-display);font-size:30px;font-weight:600;line-height:1.05;font-variant-numeric:tabular-nums}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{appearance:none;border:0;background:var(--surface);color:var(--muted);font:500 12.5px var(--f-body);padding:6px 12px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+footer{padding-block:0 32px;color:var(--muted);font-size:12px}
+footer p{margin:0;max-width:90ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <div class="brand">
+        <span class="eyebrow">Solusi 1 · Monitoring End-to-End · Makassar New Port</span>
+        <h1>Dashboard Konsolidasi Kargo KTI</h1>
+      </div>
+      <div class="cutoff" aria-live="polite">
+        <div class="lbl">Cut-off direct call berikutnya<br><b id="cutoffDate">memuat</b></div>
+        <div class="clock" id="clock">--:--:--</div>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Bagian dashboard">
+      <button class="tab" role="tab" data-v="ringkasan" id="t-ringkasan">Ringkasan</button>
+      <button class="tab" role="tab" data-v="jaringan" id="t-jaringan">Jaringan Konsolidasi</button>
+      <button class="tab" role="tab" data-v="partner" id="t-partner">Partner</button>
+      <button class="tab" role="tab" data-v="armada" id="t-armada">Tracker Armada</button>
+      <button class="tab" role="tab" data-v="proyeksi" id="t-proyeksi">Proyeksi &amp; Direct Call</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- RINGKASAN -->
+  <section class="view" data-view="ringkasan">
+    <div class="thesis panel">
+      <p>Volume terkonsolidasi minggu ini <b id="thVol">480 TEU</b>, atau <b id="thPct">84%</b> dari ambang kelayakan direct call. Pada skenario moderat, ambang terlampaui pada <b id="thYear">2027</b>.</p>
+      <span class="pill p-idle">Data ilustratif · minggu ke-43 2026</span>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="panel c7">
+      <h2>Volume terkonsolidasi per minggu</h2>
+      <p class="sub">TEU yang melewati titik konsolidasi menuju MNP, 12 minggu terakhir, dibandingkan ambang direct call.</p>
+      <div class="chart-box"><canvas id="chTrend" aria-label="Grafik tren volume mingguan"></canvas></div>
+    </div>
+    <div class="panel c5">
+      <h2>Perlu tindakan</h2>
+      <p class="sub">Peringatan aktif dari armada, titik konsolidasi, dan partner.</p>
+      <ul class="alerts" id="alertsTop"></ul>
+    </div>
+    <div class="panel c12">
+      <h2>Kontribusi titik konsolidasi</h2>
+      <p class="sub">TEU per minggu menurut titik asal. Klik baris untuk melihatnya di peta.</p>
+      <div class="tbl-wrap"><table id="tblNodesMini"></table></div>
+    </div>
+  </section>
+
+  <!-- JARINGAN -->
+  <section class="view" data-view="jaringan" hidden>
+    <div class="panel c12">
+      <h2>Peta jaringan konsolidasi</h2>
+      <p class="sub">Skematik koridor laut dan darat menuju MNP. Tebal garis sebanding dengan TEU per minggu. Pilih titik untuk melihat rinciannya.</p>
+      <div class="map-grid">
+        <div>
+          <svg class="map" id="map" viewBox="0 0 620 690" role="img" aria-label="Peta skematik titik konsolidasi Kawasan Timur Indonesia menuju Makassar New Port"></svg>
+          <div class="legend">
+            <span><i class="sw sea"></i>Feeder laut</span>
+            <span><i class="sw road"></i>Truk darat</span>
+            <span>Ukuran titik = volume</span>
+            <span>Warna titik = utilisasi hub</span>
+          </div>
+        </div>
+        <div class="detail" id="nodeDetail"></div>
+      </div>
+    </div>
+    <div class="panel c12">
+      <h2>Kinerja titik konsolidasi</h2>
+      <p class="sub">Target ilustratif. Load factor ≥ 85%, dwell ≤ 48 jam, utilisasi hub 70 sampai 90%.</p>
+      <div class="tbl-wrap"><table id="tblNodes"></table></div>
+    </div>
+  </section>
+
+  <!-- PARTNER -->
+  <section class="view" data-view="partner" hidden>
+    <div class="panel c5">
+      <h2>Pipeline kemitraan</h2>
+      <p class="sub">Jumlah partner per tahap. Tahap berikutnya hanya dibuka setelah kriteria keluar terpenuhi.</p>
+      <div class="funnel" id="funnel"></div>
+    </div>
+    <div class="panel c7">
+      <h2>Simulasi partner mundur</h2>
+      <p class="sub">Dampak terhadap volume mingguan bila satu partner kargo berhenti mengirim lewat konsolidasi.</p>
+      <div class="controls">
+        <label for="whatIf" class="muted">Partner</label>
+        <select id="whatIf"></select>
+      </div>
+      <div id="whatIfOut"></div>
+    </div>
+    <div class="panel c12">
+      <h2>Scorecard partner</h2>
+      <p class="sub">Status dihitung otomatis dari rasio realisasi terhadap komitmen bulan terakhir dan tren dua bulan.</p>
+      <div class="tbl-wrap"><table id="tblPartners"></table></div>
+    </div>
+    <div class="panel c12">
+      <h2>Heatmap komitmen vs realisasi</h2>
+      <p class="sub">Persentase realisasi TEU terhadap komitmen bulanan, Mei sampai Oktober 2026.</p>
+      <div class="tbl-wrap"><table class="heat" id="tblHeat"></table></div>
+    </div>
+  </section>
+
+  <!-- ARMADA -->
+  <section class="view" data-view="armada" hidden>
+    <div class="panel c12">
+      <h2>Alur status unit</h2>
+      <p class="sub">Setiap transisi tercatat dengan waktu dan lokasi geofence sehingga dwell dan ketepatan waktu dihitung otomatis.</p>
+      <div class="flow" id="flow"></div>
+    </div>
+    <div class="panel c8">
+      <h2>Unit aktif menuju MNP</h2>
+      <div class="controls"><div class="filters" id="fleetFilter"></div></div>
+      <div class="tbl-wrap"><table id="tblFleet"></table></div>
+    </div>
+    <div class="panel c4">
+      <h2>Peringatan armada</h2>
+      <p class="sub">Dievaluasi terhadap cut-off direct call berikutnya.</p>
+      <ul class="alerts" id="alertsFleet"></ul>
+    </div>
+  </section>
+
+  <!-- PROYEKSI -->
+  <section class="view" data-view="proyeksi" hidden>
+    <div class="panel c7">
+      <h2>Proyeksi volume terkonsolidasi</h2>
+      <p class="sub">V(t) = V₀ × (1+g)ᵗ × s(t). Potensi kargo KTI ke MNP 100.000 TEU per tahun (2026), dengan pangsa terkonsolidasi s(t) naik bertahap.</p>
+      <div class="controls">
+        <div class="seg" id="scenSeg" role="group" aria-label="Skenario">
+          <button data-s="pes">Pesimis</button><button data-s="mod" aria-pressed="true">Moderat</button><button data-s="opt">Optimis</button>
+        </div>
+        <span class="muted" id="scenNote"></span>
+      </div>
+      <div class="chart-box tall"><canvas id="chProj" aria-label="Grafik proyeksi volume tiga skenario"></canvas></div>
+    </div>
+    <div class="panel c5">
+      <h2>Simulator ambang direct call</h2>
+      <p class="sub">Direct call layak bila penghematan per TEU dikali volume menutup biaya tambahan per panggilan kapal.</p>
+      <div class="sliders">
+        <div class="sl"><label for="sVol">Volume terkonsolidasi <output id="oVol"></output></label><input type="range" id="sVol" min="200" max="1200" step="10" value="480"><div class="hint">TEU per minggu yang siap pada cut-off</div></div>
+        <div class="sl"><label for="sCall">Biaya tambahan per panggilan <output id="oCall"></output></label><input type="range" id="sCall" min="80000" max="260000" step="5000" value="160000"><div class="hint">Deviasi rute, port dues, dan waktu sandar carrier</div></div>
+        <div class="sl"><label for="sSave">Penghematan per TEU <output id="oSave"></output></label><input type="range" id="sSave" min="150" max="450" step="10" value="280"><div class="hint">Biaya transshipment Surabaya atau Jakarta yang terhindari</div></div>
+      </div>
+      <div class="verdict" id="verdict" style="margin-top:14px"></div>
+    </div>
+    <div class="panel c12">
+      <h2>Titik impas per panggilan</h2>
+      <p class="sub">Biaya tambahan direct call per TEU turun seiring volume. Di kanan titik potong, direct call lebih murah daripada transshipment.</p>
+      <div class="chart-box"><canvas id="chBE" aria-label="Grafik titik impas direct call"></canvas></div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p>Seluruh angka, nama partner, dan status kemitraan bersifat ilustratif untuk keperluan case competition dan belum merupakan data Pelindo, BPS, maupun perjanjian yang sudah terjadi. Koordinat dan rute bersifat skematik.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){
+"use strict";
+/* ================= DATA (ilustratif) ================= */
+const MNP={lat:-5.10,lon:119.40};
+const NODES=[
+ {id:"imip",nama:"IMIP Morowali",lok:"Bahodopi, Sulteng",lat:-2.80,lon:122.17,kom:"Nikel olahan (NPI, feronikel)",moda:"sea",teu:140,util:.82,dwell:38,lf:.84,
+  path:[[122.17,-2.80],[122.9,-3.3],[123.25,-4.4],[122.35,-5.95],[120.5,-6.1],[119.62,-5.6]]},
+ {id:"pomalaa",nama:"Pomalaa",lok:"Kolaka, Sultra",lat:-4.18,lon:121.60,kom:"Nikel dan produk olahan",moda:"sea",teu:55,util:.70,dwell:44,lf:.76,
+  path:[[121.60,-4.18],[121.0,-5.2],[120.6,-6.0],[119.62,-5.6]]},
+ {id:"kendari",nama:"Kendari",lok:"Sultra",lat:-3.97,lon:122.51,kom:"Kakao, hasil tambang, pertanian",moda:"sea",teu:60,util:.74,dwell:40,lf:.79,
+  path:[[122.51,-3.97],[123.25,-4.4],[122.35,-5.95],[120.5,-6.1],[119.62,-5.6]]},
+ {id:"baubau",nama:"Bau-Bau",lok:"Buton, Sultra",lat:-5.47,lon:122.61,kom:"Kopra, hasil laut",moda:"sea",teu:20,util:.55,dwell:46,lf:.62,
+  path:[[122.61,-5.47],[122.35,-5.95],[120.5,-6.1],[119.62,-5.6]]},
+ {id:"palopo",nama:"Palopo",lok:"Luwu Raya, Sulsel",lat:-2.99,lon:120.19,kom:"Kakao",moda:"road",teu:45,util:.78,dwell:36,lf:null,
+  path:[[120.19,-2.99],[119.9,-3.5],[119.63,-4.01],[119.55,-4.6]]},
+ {id:"parepare",nama:"Parepare",lok:"Sulsel",lat:-4.01,lon:119.63,kom:"Kakao, hasil pertanian",moda:"road",teu:40,util:.69,dwell:33,lf:null,
+  path:[[119.63,-4.01],[119.55,-4.6]]},
+ {id:"sulsel",nama:"Takalar–Bulukumba",lok:"Pesisir selatan Sulsel",lat:-5.50,lon:119.95,kom:"Rumput laut, perikanan",moda:"road",teu:50,util:.81,dwell:52,lf:null,
+  path:[[119.95,-5.50],[119.6,-5.3]]},
+ {id:"kima",nama:"KIMA Maros",lok:"Hub stuffing sisi MNP",lat:-5.02,lon:119.58,kom:"Stuffing, CFS, dokumen",moda:"road",teu:50,util:.88,dwell:30,lf:null,
+  path:[[119.58,-5.02]]},
+ {id:"bitung",nama:"Bitung",lok:"Sulut (opsional)",lat:1.44,lon:125.18,kom:"Tuna, kopra",moda:"sea",teu:20,util:.48,dwell:47,lf:.58,
+  path:[[125.18,1.44],[125.35,0.4],[124.3,-1.8],[123.7,-4.6],[122.35,-5.95],[120.5,-6.1],[119.62,-5.6]]}
+];
+const TREND=[362,371,368,385,392,401,398,417,428,441,463,480];
+const CALL={teuWeek:480,cost:160000,save:280};
+const MONTHS=["Mei","Jun","Jul","Agu","Sep","Okt"];
+const STAGES=["Identifikasi","Engagement","MoU","Pilot","Volume Komitmen","Rutin"];
+const PARTNERS=[
+ {n:"Feeder Domestik A",k:"Feeder",s:5,kom:900,r:[810,850,900,880,930,920],pic:"Tim Operasi MNP",next:"Kunci jadwal feeder mingguan agar selaras dengan cut-off",kargo:false},
+ {n:"Konsorsium Tenant IMIP",k:"Shipper",s:4,kom:600,r:[480,520,560,590,610,600],pic:"Key Account Nikel",next:"Tambah komoditas kedua untuk mengurangi ketergantungan nikel",kargo:true},
+ {n:"Feeder Domestik B",k:"Feeder",s:4,kom:400,r:[250,280,300,330,310,340],pic:"Tim Operasi MNP",next:"Review load factor rute Kendari dan Bau-Bau",kargo:false},
+ {n:"Forwarder/NVOCC Makassar",k:"Forwarder",s:4,kom:250,r:[230,240,210,185,160,140],pic:"Komersial",next:"Agenda review, realisasi di bawah 70% dua bulan",kargo:true},
+ {n:"Koperasi Kakao Luwu Raya",k:"Shipper",s:3,kom:180,r:[60,90,110,150,140,170],pic:"Pemda dan Komersial",next:"Ubah pilot menjadi kontrak volume Q1 2027",kargo:true},
+ {n:"Eksportir Rumput Laut Selatan",k:"Shipper",s:3,kom:200,r:[null,null,120,150,190,160],pic:"Komersial",next:"Atasi dwell di hub Takalar sebelum menambah volume",kargo:true},
+ {n:"Operator Truk & CFS KIMA",k:"Logistik darat",s:5,kom:null,r:null,pic:"Tim Operasi MNP",next:"Pasang geofence di dua gerbang KIMA",kargo:false},
+ {n:"Carrier Global A (Intra-Asia)",k:"Carrier",s:2,kom:null,r:null,pic:"Direksi Komersial",next:"Paparkan data 12 minggu, minta pilot direct call Q1 2027",kargo:false},
+ {n:"Bea Cukai & Karantina Makassar",k:"Otoritas",s:2,kom:null,r:null,pic:"Hubungan Kelembagaan",next:"Finalisasi SLA jalur prioritas kargo terkonsolidasi",kargo:false},
+ {n:"Pemprov Sulsel & Pengelola KIMA",k:"Pemerintah",s:2,kom:null,r:null,pic:"Hubungan Kelembagaan",next:"Insentif retribusi untuk truk konsolidasi",kargo:false},
+ {n:"Carrier Global B",k:"Carrier",s:1,kom:null,r:null,pic:"Direksi Komersial",next:"Kunjungan regional office Singapura",kargo:false},
+ {n:"Bank BUMN (trade finance)",k:"Keuangan",s:1,kom:null,r:null,pic:"Keuangan",next:"Rancang skema pembiayaan kargo untuk koperasi",kargo:false}
+];
+const FLOW=["PLANNED","DISPATCHED","IN_TRANSIT","AT_HUB","STUFFED","READY","LOADED","SAILING","ARRIVED_MNP","HANDED_OVER"];
+const FLEET=[
+ {id:"FDR-07",nama:"KM Feeder Tolo",tipe:"Feeder",asal:"imip",teu:120,st:"SAILING",eta:27,slip:5,prog:.42},
+ {id:"FDR-03",nama:"KM Feeder Teluk Bone",tipe:"Feeder",asal:"pomalaa",teu:64,st:"SAILING",eta:12,slip:0,prog:.61},
+ {id:"FDR-11",nama:"KM Feeder Kendari",tipe:"Feeder",asal:"kendari",teu:58,st:"LOADED",eta:16,slip:1,prog:.18},
+ {id:"FDR-05",nama:"KM Feeder Buton",tipe:"Feeder",asal:"baubau",teu:18,st:"READY",eta:20,slip:0,prog:.05},
+ {id:"FDR-14",nama:"KM Feeder Lembeh",tipe:"Feeder",asal:"bitung",teu:20,st:"SAILING",eta:58,slip:0,prog:.22},
+ {id:"TRK-0412",nama:"Truk B 9412 DD",tipe:"Truk",asal:"palopo",teu:2,st:"IN_TRANSIT",eta:6,slip:0,prog:.55},
+ {id:"TRK-0377",nama:"Truk DD 8377 KB",tipe:"Truk",asal:"parepare",teu:2,st:"ARRIVED_MNP",eta:0,slip:0,prog:1},
+ {id:"TRK-0450",nama:"Truk DD 9450 TL",tipe:"Truk",asal:"sulsel",teu:1,st:"AT_HUB",eta:9,slip:0,prog:.3,dwell:52},
+ {id:"TRK-0461",nama:"Truk DD 8461 BK",tipe:"Truk",asal:"sulsel",teu:2,st:"IN_TRANSIT",eta:4,slip:0,prog:.7},
+ {id:"TRK-0398",nama:"Truk DD 8398 MR",tipe:"Truk",asal:"kima",teu:4,st:"STUFFED",eta:3,slip:0,prog:.85,hold:7}
+];
+const SCEN={
+ pes:{nama:"Pesimis",g:.03,s1:.30},
+ mod:{nama:"Moderat",g:.06,s1:.40},
+ opt:{nama:"Optimis",g:.09,s1:.55}
+};
+const YEARS=[2026,2027,2028,2029,2030];
+const V0=100000,S0=.25;
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+const nf=new Intl.NumberFormat("id-ID");
+const fmt=n=>nf.format(Math.round(n));
+const usd=n=>"USD "+nf.format(Math.round(n));
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const node=id=>NODES.find(n=>n.id===id);
+function threshold(c=CALL.cost,s=CALL.save){return c/s}
+function scenSeries(k){const sc=SCEN[k];return YEARS.map((y,i)=>V0*Math.pow(1+sc.g,i)*(S0+(sc.s1-S0)*i/4))}
+function crossYear(k){const th=threshold()*52;const s=scenSeries(k);const i=s.findIndex(v=>v>=th);return i<0?null:YEARS[i]}
+function pillFor(level,text){return `<span class="pill p-${level}">${text}</span>`}
+
+/* ================= CUT-OFF CLOCK ================= */
+// Cut-off direct call: setiap Jumat 18.00 WITA (UTC+8), kapal sandar Sabtu 08.00 WITA.
+function nextCutoff(){
+  const now=new Date();
+  const wita=new Date(now.getTime()+8*3600e3);
+  let d=new Date(Date.UTC(wita.getUTCFullYear(),wita.getUTCMonth(),wita.getUTCDate(),18,0,0));
+  let add=(5-wita.getUTCDay()+7)%7;
+  d=new Date(d.getTime()+add*86400e3);
+  if(d.getTime()<=wita.getTime()) d=new Date(d.getTime()+7*86400e3);
+  return new Date(d.getTime()-8*3600e3);
+}
+let CUT=nextCutoff();
+const hoursToCut=()=>(CUT-new Date())/3600e3;
+function tick(){
+  let ms=CUT-new Date(); if(ms<=0){CUT=nextCutoff();ms=CUT-new Date();renderFleet();renderAlerts();}
+  const h=Math.floor(ms/3600e3),m=Math.floor(ms%3600e3/60e3),s=Math.floor(ms%60e3/1e3);
+  $("#clock").textContent=`${h}j ${String(m).padStart(2,"0")}m ${String(s).padStart(2,"0")}d`;
+}
+function renderCutLabel(){
+  const f=new Intl.DateTimeFormat("id-ID",{weekday:"long",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Makassar"});
+  $("#cutoffDate").textContent=f.format(CUT).replace("pukul ","")+" WITA";
+}
+
+/* ================= ALERTS ================= */
+function buildAlerts(){
+  const a=[]; const hc=hoursToCut();
+  FLEET.forEach(u=>{
+    const n=node(u.asal);
+    if(u.hold) a.push({sev:"bad",src:"Armada",what:`${u.id} tertahan dokumen karantina ${u.hold} jam`,act:"Eskalasi ke Bea Cukai & Karantina, jalur SLA prioritas"});
+    if(u.st!=="ARRIVED_MNP"&&u.eta>hc&&u.eta-hc<24) a.push({sev:"bad",src:"Armada",what:`${u.id} (${fmt(u.teu)} TEU dari ${n.nama}) tiba setelah cut-off`,act:`ETA ${Math.round(u.eta)} jam, cut-off ${Math.round(hc)} jam lagi. Minta percepatan atau alihkan ke panggilan berikutnya`});
+    else if(u.st!=="ARRIVED_MNP"&&u.eta>hc) a.push({sev:"warn",src:"Armada",what:`${u.id} dijadwalkan untuk panggilan berikutnya`,act:`ETA ${Math.round(u.eta)} jam, masuk alokasi direct call minggu depan`});
+    if(u.slip>4) a.push({sev:"warn",src:"Armada",what:`${u.id} ETA mundur ${u.slip} jam`,act:"Notifikasi otomatis ke perencana dermaga MNP"});
+    if(u.dwell>48) a.push({sev:"warn",src:"Hub",what:`${u.id} menunggu di hub ${u.dwell} jam`,act:`Dwell di atas 48 jam di ${n.nama}. Gabungkan muatan atau kirim parsial`});
+  });
+  NODES.forEach(n=>{ if(n.lf!==null&&n.lf<.7) a.push({sev:"warn",src:"Titik",what:`Load factor feeder ${n.nama} ${Math.round(n.lf*100)}%`,act:"Gabungkan muatan dengan rute terdekat atau tunda keberangkatan"}); });
+  const kargo=PARTNERS.filter(p=>p.kargo); const tot=kargo.reduce((s,p)=>s+p.r[5],0);
+  kargo.forEach(p=>{ const sh=p.r[5]/tot; if(sh>.4) a.push({sev:"warn",src:"Partner",what:`Konsentrasi ${p.n} ${Math.round(sh*100)}% dari kargo partner`,act:"Risiko ketergantungan satu komoditas. Prioritaskan onboarding kakao dan rumput laut"}); });
+  PARTNERS.forEach(p=>{ const st=partnerStatus(p); if(st.level==="bad") a.push({sev:"bad",src:"Partner",what:`${p.n} memenuhi ${st.pct}% komitmen`,act:p.next}); });
+  const order={bad:0,warn:1,info:2}; return a.sort((x,y)=>order[x.sev]-order[y.sev]);
+}
+function alertHTML(x){const col={bad:"var(--bad)",warn:"var(--warn)",info:"var(--accent)"}[x.sev];
+  return `<li style="--sev:${col}">${pillFor(x.sev==="info"?"info":x.sev,x.src)}<span class="what">${x.what}</span><span class="act">${x.act}</span></li>`}
+function renderAlerts(){const a=buildAlerts();
+  $("#alertsTop").innerHTML=a.slice(0,5).map(alertHTML).join("");
+  $("#alertsFleet").innerHTML=a.filter(x=>x.src==="Armada"||x.src==="Hub").map(alertHTML).join("")||`<li style="--sev:var(--good)">${pillFor("good","Aman")}<span class="what">Tidak ada peringatan</span></li>`;
+}
+
+/* ================= KPI ================= */
+function renderKPIs(){
+  const th=threshold(); const pct=CALL.teuWeek/th;
+  const aktif=PARTNERS.filter(p=>p.s>=4).length;
+  const lfN=NODES.filter(n=>n.lf!==null); const lf=lfN.reduce((s,n)=>s+n.lf*n.teu,0)/lfN.reduce((s,n)=>s+n.teu,0);
+  const dwell=NODES.reduce((s,n)=>s+n.dwell*n.teu,0)/NODES.reduce((s,n)=>s+n.teu,0);
+  const cy=crossYear("mod");
+  const K=[
+    {k:"TEU terkonsolidasi minggu ini",v:fmt(CALL.teuWeek),u:"TEU",t:`ambang ${fmt(th)} TEU`,p:pct,st:pct>=1?"good":pct>=.8?"warn":"bad"},
+    {k:"Partner aktif (komitmen dan rutin)",v:aktif,u:`/ ${PARTNERS.length}`,t:"tahap 5 dan 6",p:aktif/PARTNERS.length,st:"info"},
+    {k:"Cut-off compliance",v:"86",u:"%",t:"target 90%",p:.86/.9,st:"warn"},
+    {k:"Load factor feeder",v:Math.round(lf*100),u:"%",t:"target 85%",p:lf/.85,st:lf>=.85?"good":"warn"},
+    {k:"Dwell rata-rata di hub",v:Math.round(dwell),u:"jam",t:"batas 48 jam",p:dwell/48,st:dwell<=48?"good":"bad"},
+    {k:"Direct call layak (moderat)",v:cy??"–",u:"",t:"skenario moderat",p:null,st:"info"}
+  ];
+  const col={good:"var(--good)",warn:"var(--warn)",bad:"var(--bad)",info:"var(--accent)"};
+  $("#kpis").innerHTML=K.map(x=>`<div class="kpi" style="--st:${col[x.st]}"><span class="k">${x.k}</span><span class="v">${x.v}<small>${x.u}</small></span>${x.p!==null?`<div class="bar"><i style="width:${Math.min(100,x.p*100)}%"></i></div>`:""}<span class="t">${x.t}</span></div>`).join("");
+  $("#thVol").textContent=fmt(CALL.teuWeek)+" TEU"; $("#thPct").textContent=Math.round(pct*100)+"%"; $("#thYear").textContent=cy??"setelah 2030";
+}
+
+/* ================= NODE TABLES ================= */
+function utilLevel(u){return u>.9?"bad":u>=.7?"good":"warn"}
+function renderNodeTables(){
+  const tot=NODES.reduce((s,n)=>s+n.teu,0);
+  const sorted=[...NODES].sort((a,b)=>b.teu-a.teu);
+  $("#tblNodesMini").innerHTML=`<thead><tr><th>Titik</th><th>Komoditas utama</th><th>Moda</th><th class="num">TEU/minggu</th><th class="num">Porsi</th><th style="width:28%">Kontribusi</th></tr></thead><tbody>`+
+    sorted.map(n=>`<tr class="clickable" data-node="${n.id}"><td><b>${n.nama}</b><div class="muted" style="font-size:12px">${n.lok}</div></td><td>${n.kom}</td><td>${n.moda==="sea"?"Feeder laut":"Truk darat"}</td><td class="num">${fmt(n.teu)}</td><td class="num">${Math.round(n.teu/tot*100)}%</td><td><div class="bar" style="height:8px"><i style="width:${n.teu/sorted[0].teu*100}%;background:${n.moda==="sea"?"var(--accent)":"var(--warn)"}"></i></div></td></tr>`).join("")+"</tbody>";
+  $("#tblNodes").innerHTML=`<thead><tr><th>Titik</th><th>Moda</th><th class="num">TEU/minggu</th><th class="num">Utilisasi hub</th><th class="num">Load factor</th><th class="num">Dwell (jam)</th><th>Status</th></tr></thead><tbody>`+
+    sorted.map(n=>{const issues=[];if(n.dwell>48)issues.push("dwell");if(n.lf!==null&&n.lf<.7)issues.push("load factor");if(n.util>.9)issues.push("padat");
+      const lvl=issues.length?"warn":"good";
+      return `<tr class="clickable" data-node="${n.id}"><td><b>${n.nama}</b><div class="muted" style="font-size:12px">${n.lok}</div></td><td>${n.moda==="sea"?"Feeder laut":"Truk darat"}</td><td class="num">${fmt(n.teu)}</td><td class="num">${Math.round(n.util*100)}%</td><td class="num">${n.lf===null?"–":Math.round(n.lf*100)+"%"}</td><td class="num">${n.dwell}</td><td>${pillFor(lvl,issues.length?"Cek "+issues.join(", "):"Sesuai target")}</td></tr>`}).join("")+"</tbody>";
+  document.querySelectorAll("tr[data-node]").forEach(tr=>tr.addEventListener("click",()=>{show("jaringan");selectNode(tr.dataset.node)}));
+}
+
+/* ================= MAP ================= */
+const W=620,H=690,LON0=118.4,LON1=126.0,LAT0=2.2,LAT1=-6.4;
+const px=(lon,lat)=>[(lon-LON0)/(LON1-LON0)*W,(LAT0-lat)/(LAT0-LAT1)*H];
+const SULAWESI=[[119.42,-5.14],[119.5,-4.6],[119.62,-4.01],[119.35,-3.45],[118.88,-2.68],[118.95,-2.0],[119.5,-1.4],[119.87,-0.9],[119.73,-0.67],[119.85,0.0],[120.3,0.75],[120.8,1.05],[121.4,1.15],[122.2,1.0],[122.9,0.95],[123.8,0.92],[124.4,1.2],[124.84,1.49],[125.18,1.55],[125.25,1.35],[124.9,1.0],[124.3,0.55],[123.6,0.45],[123.06,0.5],[122.3,0.45],[121.5,0.45],[120.6,0.4],[120.18,-0.78],[120.75,-1.39],[121.2,-1.0],[121.6,-0.87],[122.2,-0.75],[122.79,-0.95],[123.4,-0.85],[123.35,-1.15],[122.8,-1.3],[122.4,-1.65],[122.3,-2.6],[122.25,-2.95],[122.6,-3.45],[122.6,-3.97],[123.1,-4.15],[122.75,-4.55],[122.2,-4.75],[121.7,-4.5],[121.6,-4.05],[121.35,-3.2],[121.1,-2.6],[120.45,-2.7],[120.2,-3.0],[120.35,-3.9],[120.33,-4.54],[120.25,-5.12],[120.25,-5.55],[119.75,-5.68],[119.45,-5.45]];
+const BUTON=[[122.55,-4.9],[122.85,-4.95],[123.0,-5.3],[122.85,-5.7],[122.6,-5.6],[122.5,-5.25]];
+const MUNA=[[122.3,-4.6],[122.6,-4.75],[122.5,-5.2],[122.3,-5.3],[122.2,-4.95]];
+let selNode="imip";
+function poly(pts){return pts.map(p=>px(p[0],p[1]).map(v=>v.toFixed(1)).join(",")).join(" ")}
+function drawMap(){
+  const svg=$("#map"); let h="";
+  h+=`<g class="grid">`;
+  for(let lon=119;lon<=125;lon++){const[x]=px(lon,0);h+=`<line x1="${x}" y1="0" x2="${x}" y2="${H}"/><text x="${x+3}" y="${H-6}">${lon}°BT</text>`}
+  for(let lat=2;lat>=-6;lat-=2){const[,y]=px(LON0,lat);h+=`<line x1="0" y1="${y}" x2="${W}" y2="${y}"/><text x="4" y="${y-3}">${lat===0?"0°":Math.abs(lat)+"°"+(lat>0?"LU":"LS")}</text>`}
+  h+=`</g>`;
+  h+=`<polygon class="land" points="${poly(SULAWESI)}"/><polygon class="land" points="${poly(BUTON)}"/><polygon class="land" points="${poly(MUNA)}"/>`;
+  const [mx,my]=px(MNP.lon,MNP.lat);
+  NODES.forEach(n=>{const pts=[...n.path,[MNP.lon,MNP.lat]].map(p=>px(p[0],p[1]).map(v=>v.toFixed(1)).join(",")).join(" ");
+    h+=`<polyline class="route ${n.moda}" data-r="${n.id}" points="${pts}" stroke-width="${(1.5+n.teu/18).toFixed(1)}"/>`});
+  NODES.forEach(n=>{const[x,y]=px(n.lon,n.lat);const r=(4+Math.sqrt(n.teu)*.75).toFixed(1);
+    const c={good:"var(--good)",warn:"var(--warn)",bad:"var(--bad)"}[utilLevel(n.util)];
+    const left=["parepare","palopo","sulsel"].includes(n.id);
+    h+=`<g class="node" data-n="${n.id}" tabindex="0" role="button" aria-label="${n.nama}, ${n.teu} TEU per minggu"><circle class="dot" cx="${x}" cy="${y}" r="${r}" fill="${c}"/><text x="${left?x-+r-5:x+ +r+5}" y="${y+4}" text-anchor="${left?"end":"start"}">${n.nama}</text></g>`});
+  h+=`<g class="mnp"><rect x="${mx-7}" y="${my-7}" width="14" height="14" transform="rotate(45 ${mx} ${my})"/><text x="${mx-12}" y="${my+22}" text-anchor="end">MNP</text></g>`;
+  svg.innerHTML=h;
+  svg.querySelectorAll(".node").forEach(g=>{g.addEventListener("click",()=>selectNode(g.dataset.n));g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectNode(g.dataset.n)}})});
+  selectNode(selNode);
+}
+function selectNode(id){
+  selNode=id; const n=node(id);
+  document.querySelectorAll(".route").forEach(r=>{r.classList.toggle("hi",r.dataset.r===id);r.classList.toggle("dim",r.dataset.r!==id)});
+  const units=FLEET.filter(u=>u.asal===id&&u.st!=="ARRIVED_MNP");
+  const lvl=utilLevel(n.util);
+  $("#nodeDetail").innerHTML=`<div><span class="eyebrow">${n.lok} · ${n.moda==="sea"?"Feeder laut":"Truk darat"}</span><h3>${n.nama}</h3><p class="muted" style="margin:4px 0 0">${n.kom}</p></div>
+  <dl class="dl">
+    <div><dt>TEU per minggu</dt><dd>${fmt(n.teu)}</dd></div>
+    <div><dt>Utilisasi hub</dt><dd>${Math.round(n.util*100)}<small>%</small></dd></div>
+    <div><dt>Load factor feeder</dt><dd>${n.lf===null?"–":Math.round(n.lf*100)+"<small>%</small>"}</dd></div>
+    <div><dt>Dwell rata-rata</dt><dd>${n.dwell}<small>jam</small></dd></div>
+  </dl>
+  <div>${pillFor(lvl,lvl==="good"?"Utilisasi sehat":lvl==="warn"?"Utilisasi rendah":"Hub padat")} ${n.dwell>48?pillFor("warn","Dwell > 48 jam"):""} ${n.lf!==null&&n.lf<.7?pillFor("warn","Load factor < 70%"):""}</div>
+  <div><span class="eyebrow">Unit dalam perjalanan</span>${units.length?`<ul class="alerts" style="margin-top:6px">${units.map(u=>`<li style="--sev:var(--accent)">${pillFor("info",u.st)}<span class="what">${u.id} · ${u.teu} TEU</span><span class="act">ETA MNP ${u.eta} jam</span></li>`).join("")}</ul>`:`<p class="muted" style="margin:6px 0 0">Tidak ada unit aktif dari titik ini.</p>`}</div>`;
+}
+
+/* ================= PARTNERS ================= */
+function partnerStatus(p){
+  if(p.kom==null||!p.r) return {level:"idle",label:"Non-volume",pct:null};
+  const last=p.r[5],prev=p.r[4],pct=Math.round(last/p.kom*100),pp=prev/p.kom;
+  if(last/p.kom<.7&&pp<.7) return {level:"bad",label:"Merah",pct};
+  if(last/p.kom<.9) return {level:"warn",label:"Kuning",pct};
+  return {level:"good",label:"Hijau",pct};
+}
+function renderPartners(){
+  const counts=STAGES.map((_,i)=>PARTNERS.filter(p=>p.s===i).length);
+  const max=Math.max(...counts);
+  $("#funnel").innerHTML=STAGES.map((s,i)=>`<div class="frow"><span>${i+1}. ${s}</span><div class="fb"><i style="width:${counts[i]/max*100}%;--o:${.35+i*.13}"></i></div><span class="n">${counts[i]} partner</span></div>`).join("");
+  const rows=[...PARTNERS].sort((a,b)=>b.s-a.s);
+  $("#tblPartners").innerHTML=`<thead><tr><th>Partner</th><th>Kategori</th><th>Tahap</th><th class="num">Komitmen TEU/bln</th><th class="num">Realisasi Okt</th><th>Status</th><th>Langkah berikutnya</th></tr></thead><tbody>`+
+   rows.map(p=>{const st=partnerStatus(p);
+    return `<tr><td><b>${p.n}</b><div class="muted" style="font-size:12px">PIC ${p.pic}</div></td><td>${p.k}</td><td><div class="stage" title="${STAGES[p.s]}">${STAGES.map((_,i)=>`<i class="${i<=p.s?"on":""}"></i>`).join("")}</div><div class="muted" style="font-size:12px">${STAGES[p.s]}</div></td><td class="num">${p.kom?fmt(p.kom):"–"}</td><td class="num">${p.r?fmt(p.r[5])+` <span class="muted">(${st.pct}%)</span>`:"–"}</td><td>${pillFor(st.level,st.label)}</td><td style="min-width:240px">${p.next}</td></tr>`}).join("")+"</tbody>";
+  const hp=PARTNERS.filter(p=>p.kom&&p.r);
+  const cell=(v,k)=>{if(v==null) return `<td class="h na">–</td>`;const r=v/k;
+    const c=r>=.9?"var(--good)":r>=.7?"var(--warn)":"var(--bad)"; const a=Math.min(.85,.25+Math.abs(r-.8)*1.2);
+    return `<td class="h" style="background:color-mix(in srgb, ${c} ${Math.round(a*100)}%, transparent);color:${a>.55?"var(--surface)":"var(--ink)"}">${Math.round(r*100)}%</td>`};
+  $("#tblHeat").innerHTML=`<thead><tr><th>Partner</th><th class="num">Komitmen</th>${MONTHS.map(m=>`<th class="num" style="text-align:center">${m}</th>`).join("")}</tr></thead><tbody>`+
+    hp.map(p=>`<tr><td><b>${p.n}</b></td><td class="num">${fmt(p.kom)}</td>${p.r.map(v=>cell(v,p.kom)).join("")}</tr>`).join("")+"</tbody>";
+  const sel=$("#whatIf"); sel.innerHTML=PARTNERS.filter(p=>p.kargo).map((p,i)=>`<option value="${i}">${p.n}</option>`).join(""); sel.addEventListener("change",renderWhatIf); renderWhatIf();
+}
+function renderWhatIf(){
+  const kargo=PARTNERS.filter(p=>p.kargo); const p=kargo[+$("#whatIf").value||0];
+  const loss=p.r[5]/4.33; const after=CALL.teuWeek-loss; const th=threshold();
+  const ok=after>=th; const gap=th-after;
+  $("#whatIfOut").innerHTML=`<div class="callout"><div><div class="eyebrow">Volume mingguan</div><div class="big">${fmt(CALL.teuWeek)} → ${fmt(after)} <span style="font-size:16px" class="muted">TEU</span></div></div>
+  <div>${pillFor(ok?"good":after>=th*.8?"warn":"bad",`−${fmt(loss)} TEU/minggu`)}</div></div>
+  <p style="margin:12px 0 0">${ok?`Volume tetap di atas ambang direct call ${fmt(th)} TEU.`:`Jarak ke ambang direct call melebar menjadi ${fmt(gap)} TEU per minggu.`} Porsi ${p.n} saat ini ${Math.round(p.r[5]/kargo.reduce((s,q)=>s+q.r[5],0)*100)}% dari kargo partner.</p>
+  <p class="muted" style="margin:6px 0 0">Mitigasi: ${p.next.charAt(0).toLowerCase()+p.next.slice(1)}.</p>`;
+}
+
+/* ================= FLEET ================= */
+let fleetFilter="Semua";
+function renderFleet(){
+  const hc=hoursToCut();
+  $("#flow").innerHTML=FLOW.map((s,i)=>{const n=FLEET.filter(u=>u.st===s).length;return `${i?"<b>›</b>":""}<span class="${n?"on":""}">${s}${n?" · "+n:""}</span>`}).join("")+` <b>|</b> <span>DELAYED</span><span>HOLD</span><span>DIVERTED</span>`;
+  $("#fleetFilter").innerHTML=["Semua","Feeder","Truk","Berisiko"].map(f=>`<button class="chip" aria-pressed="${f===fleetFilter}" data-f="${f}">${f}</button>`).join("");
+  $("#fleetFilter").querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{fleetFilter=b.dataset.f;renderFleet()}));
+  const risk=u=>u.st!=="ARRIVED_MNP"&&(u.eta>hc||u.hold||u.slip>4||u.dwell>48);
+  const list=FLEET.filter(u=>fleetFilter==="Semua"||(fleetFilter==="Berisiko"?risk(u):u.tipe===fleetFilter)).sort((a,b)=>a.eta-b.eta);
+  $("#tblFleet").innerHTML=`<thead><tr><th>Unit</th><th>Asal</th><th class="num">TEU</th><th>Status</th><th>Progres rute</th><th class="num">ETA MNP</th><th>Cut-off</th></tr></thead><tbody>`+
+   list.map(u=>{const n=node(u.asal);let st=u.st,lvl="info";if(u.hold){st="HOLD";lvl="bad"}else if(u.slip>4){st="DELAYED";lvl="warn"}else if(u.st==="ARRIVED_MNP")lvl="good";
+    const cut=u.st==="ARRIVED_MNP"?pillFor("good","Masuk"):u.eta<=hc-2?pillFor("good","Aman"):u.eta<=hc?pillFor("warn","Mepet"):u.eta-hc<24?pillFor("bad","Terlambat"):pillFor("idle","Panggilan berikut");
+    const col={good:"var(--good)",warn:"var(--warn)",bad:"var(--bad)",info:"var(--accent)"}[lvl];
+    return `<tr><td class="unit">${u.id}<small>${u.nama} · ${u.tipe}</small></td><td>${n.nama}</td><td class="num">${u.teu}</td><td>${pillFor(lvl,st)}</td><td><div class="prog" style="--st:${col}"><i style="width:${u.prog*100}%"></i></div></td><td class="num">${u.st==="ARRIVED_MNP"?"tiba":u.eta+" jam"}${u.slip?` <span class="muted">(+${u.slip})</span>`:""}</td><td>${cut}</td></tr>`}).join("")+"</tbody>";
+}
+
+/* ================= CHARTS ================= */
+let charts={};
+function chartTheme(){
+  if(!window.Chart) return null;
+  Chart.defaults.font.family=cssv("--f-body")||"sans-serif";
+  Chart.defaults.color=cssv("--muted"); Chart.defaults.borderColor=cssv("--line");
+  return {ink:cssv("--ink"),muted:cssv("--muted"),line:cssv("--line"),accent:cssv("--accent"),soft:cssv("--accent-soft"),warn:cssv("--warn"),good:cssv("--good"),bad:cssv("--bad"),surface:cssv("--surface")};
+}
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function mk(id,cfg){ if(charts[id]) charts[id].destroy(); cfg.options=Object.assign({responsive:true,maintainAspectRatio:false,animation:RM?false:{duration:400}},cfg.options||{}); charts[id]=new Chart(document.getElementById(id),cfg); }
+function lineAt(value,color,label){return {id:"th"+label,afterDatasetsDraw(c){const{ctx,chartArea:a,scales:{y}}=c;const yy=y.getPixelForValue(value);if(yy<a.top||yy>a.bottom)return;ctx.save();ctx.strokeStyle=color;ctx.setLineDash([5,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(a.left,yy);ctx.lineTo(a.right,yy);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=color;ctx.font="500 11px "+(cssv("--f-mono")||"monospace");ctx.textAlign="right";ctx.fillText(label,a.right-4,yy-6);ctx.restore()}}}
+function drawTrend(T){
+  const th=threshold(); const labels=TREND.map((_,i)=>"M"+(32+i));
+  mk("chTrend",{type:"line",data:{labels,datasets:[{data:TREND,borderColor:T.accent,backgroundColor:T.soft,fill:true,tension:.3,borderWidth:2,pointRadius:TREND.map((_,i)=>i===TREND.length-1?5:0),pointBackgroundColor:T.accent}]},
+    options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.y)+" TEU"}}},scales:{y:{min:300,max:650,ticks:{callback:v=>fmt(v)},title:{display:true,text:"TEU per minggu"}},x:{grid:{display:false}}}},
+    plugins:[lineAt(th,T.warn,`Ambang direct call ${fmt(th)} TEU`)]});
+}
+let scen="mod";
+function drawProj(T){
+  const th=threshold()*52; const P=scenSeries("pes"),M=scenSeries("mod"),O=scenSeries("opt"); const cur=scenSeries(scen);
+  const ds=[
+    {label:"Optimis",data:O,borderColor:"transparent",backgroundColor:T.soft,fill:"+1",pointRadius:0},
+    {label:"Pesimis",data:P,borderColor:"transparent",backgroundColor:T.soft,fill:false,pointRadius:0},
+    {label:"Pesimis",data:P,borderColor:T.muted,borderDash:[3,3],borderWidth:1.2,pointRadius:0,fill:false},
+    {label:"Optimis",data:O,borderColor:T.muted,borderDash:[3,3],borderWidth:1.2,pointRadius:0,fill:false},
+    {label:SCEN[scen].nama,data:cur,borderColor:T.accent,borderWidth:2.5,pointRadius:4,pointBackgroundColor:T.accent,fill:false},
+    {label:"Realisasi 2026",data:[CALL.teuWeek*52,null,null,null,null],borderColor:T.ink,backgroundColor:T.ink,pointRadius:6,pointStyle:"rectRot",showLine:false}
+  ];
+  mk("chProj",{type:"line",data:{labels:YEARS,datasets:ds},options:{plugins:{legend:{labels:{filter:i=>[4,5].includes(i.datasetIndex),boxWidth:12}},tooltip:{filter:i=>[2,3,4,5].includes(i.datasetIndex),callbacks:{label:c=>c.dataset.label+" "+fmt(c.parsed.y)+" TEU"}}},
+    scales:{y:{min:20000,max:85000,ticks:{callback:v=>fmt(v/1000)+" rb"},title:{display:true,text:"TEU per tahun"}},x:{grid:{display:false}}}},
+    plugins:[lineAt(th,T.warn,`Ambang ${fmt(th/1000)} rb TEU/thn`)]});
+  const cy=crossYear(scen); const sc=SCEN[scen];
+  $("#scenNote").textContent=`g ${Math.round(sc.g*100)}% per tahun, pangsa ${Math.round(S0*100)}% → ${Math.round(sc.s1*100)}% · 2030 ≈ ${fmt(cur[4]/1000)} rb TEU · ${cy?"ambang terlampaui "+cy:"ambang belum terlampaui"}`;
+}
+function drawBE(T){
+  const xs=[];for(let v=150;v<=1200;v+=25)xs.push(v);
+  const be=threshold();
+  mk("chBE",{type:"line",data:{labels:xs,datasets:[
+    {label:"Biaya tambahan direct call per TEU",data:xs.map(v=>CALL.cost/v),borderColor:T.accent,borderWidth:2.5,pointRadius:0,tension:.2},
+    {label:"Biaya transshipment yang terhindari per TEU",data:xs.map(()=>CALL.save),borderColor:T.warn,borderWidth:2,borderDash:[6,4],pointRadius:0},
+    {label:"Volume saat ini",data:xs.map(v=>Math.abs(v-CALL.teuWeek)<12.5?CALL.cost/CALL.teuWeek:null),borderColor:T.ink,backgroundColor:T.ink,pointRadius:6,pointStyle:"rectRot",showLine:false}
+  ]},options:{interaction:{mode:"index",intersect:false},plugins:{legend:{labels:{boxWidth:12}},tooltip:{callbacks:{title:c=>c[0].label+" TEU/minggu",label:c=>c.parsed.y==null?null:c.dataset.label+" "+usd(c.parsed.y)}}},
+    scales:{y:{min:0,max:800,ticks:{callback:v=>"USD "+v},title:{display:true,text:"USD per TEU"}},x:{ticks:{maxTicksLimit:12,callback:function(v){return this.getLabelForValue(v)}},title:{display:true,text:`TEU per minggu (titik impas ${fmt(be)})`}}}}});
+}
+function drawAll(){const T=chartTheme();if(!T)return;drawTrend(T);drawProj(T);drawBE(T);}
+
+/* ================= SIMULATOR ================= */
+function readSim(){
+  CALL.teuWeek=+$("#sVol").value; CALL.cost=+$("#sCall").value; CALL.save=+$("#sSave").value;
+  $("#oVol").textContent=fmt(CALL.teuWeek)+" TEU"; $("#oCall").textContent=usd(CALL.cost); $("#oSave").textContent=usd(CALL.save);
+  const be=threshold(); const net=CALL.teuWeek*CALL.save-CALL.cost; const ok=net>=0;
+  const v=$("#verdict"); v.style.background=ok?"var(--good-soft)":"var(--bad-soft)";
+  v.innerHTML=`${pillFor(ok?"good":"bad",ok?"Layak direct call":"Belum layak")}<span class="big">Titik impas ${fmt(be)} TEU/minggu</span><span>${ok?`Surplus ${usd(net)} per panggilan, atau sekitar ${usd(net*52)} per tahun bagi pengguna jasa.`:`Kurang ${fmt(be-CALL.teuWeek)} TEU per minggu. Defisit ${usd(-net)} per panggilan.`}</span>`;
+}
+function onSim(){readSim();renderKPIs();renderWhatIf();const T=chartTheme();if(T){drawTrend(T);drawProj(T);drawBE(T)}}
+
+/* ================= TABS ================= */
+const VIEWS=["ringkasan","jaringan","partner","armada","proyeksi"];
+function show(v){ if(!VIEWS.includes(v)) v="ringkasan";
+  document.querySelectorAll(".view").forEach(s=>s.hidden=s.dataset.view!==v);
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.v===v));
+  try{history.replaceState(null,"","#"+v)}catch(e){}
+  try{localStorage.setItem("kti-tab",v)}catch(e){}
+  Object.values(charts).forEach(c=>c.resize());
+}
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>show(t.dataset.v)));
+$("#scenSeg").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{scen=b.dataset.s;$("#scenSeg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));const T=chartTheme();if(T)drawProj(T)}));
+["sVol","sCall","sSave"].forEach(id=>$("#"+id).addEventListener("input",onSim));
+
+/* ================= INIT ================= */
+renderCutLabel(); tick(); setInterval(tick,1000);
+readSim(); renderKPIs(); renderNodeTables(); drawMap(); renderPartners(); renderFleet(); renderAlerts();
+let start=(location.hash||"").slice(1); if(!start){try{start=localStorage.getItem("kti-tab")||""}catch(e){}}
+show(start||"ringkasan");
+drawAll();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>setTimeout(drawAll,50));
+new MutationObserver(()=>setTimeout(drawAll,50)).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+})();
+</script>
+
+</body>
+</html>
