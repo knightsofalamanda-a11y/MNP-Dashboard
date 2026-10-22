@@ -190,8 +190,7 @@ header.top{background:var(--surface);border-bottom:1px solid var(--line);box-sha
 .callout .big,.verdict .big{font-size:24px;font-weight:700;letter-spacing:-.01em}
 .detail h3{font-size:20px;font-weight:700;color:var(--navy)}
 h1{font-weight:800}
-.thesis{background:var(--navy);border-color:var(--navy);color:var(--on-navy)}
-.thesis .pill{background:rgba(255,255,255,.12);color:var(--on-navy)}
+.thesis .pill{background:var(--accent-soft);color:var(--navy)}
 .chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
 /* hero */
 .portal{gap:18px}
@@ -235,6 +234,10 @@ h1{font-weight:800}
 .card.soon .go{color:var(--muted)}
 .card.role .ill{height:110px}
 .card.role .ill svg{height:88px}
+.view-hero{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));margin-bottom:18px}
+.soon-tabs{display:inline-flex;gap:4px;margin-left:auto;padding-left:12px}
+.soon-tab{display:inline-flex;align-items:center;gap:6px;color:#9AA4B8;font:600 14px var(--f-body);padding:10px 12px 12px;white-space:nowrap;cursor:default}
+.soon-tab em{font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
 .crumb{grid-column:span 12;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 .crumb button{appearance:none;border:0;background:none;color:var(--accent);font:600 13px var(--f-body);cursor:pointer;padding:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -259,12 +262,12 @@ h1{font-weight:800}
       </div>
     </div>
     <nav class="tabs" role="tablist" aria-label="Modul" id="modNav" hidden>
-      <button class="tab" role="tab" data-v="beranda" id="t-beranda">Beranda</button>
       <button class="tab" role="tab" data-v="ringkasan" id="t-ringkasan">Ringkasan</button>
       <button class="tab" role="tab" data-v="jaringan" id="t-jaringan">Jaringan Konsolidasi</button>
       <button class="tab" role="tab" data-v="partner" id="t-partner">Partner</button>
       <button class="tab" role="tab" data-v="armada" id="t-armada">Tracker Armada</button>
       <button class="tab" role="tab" data-v="proyeksi" id="t-proyeksi">Proyeksi &amp; Direct Call</button>
+      <span id="soonTabs" class="soon-tabs"></span>
     </nav>
   </div>
 </header>
@@ -285,8 +288,8 @@ h1{font-weight:800}
     <div class="cards roles" id="roleCards"></div>
   </section>
 
-  <!-- BERANDA -->
-  <section class="view portal" data-view="beranda" hidden>
+  <!-- BANNER PERAN (tampil di modul pertama tiap peran) -->
+  <section class="view-hero" id="roleHero" hidden>
     <div class="hero">
       <div class="hero-text">
         <span class="hero-eyebrow" id="heroRole">Peran</span>
@@ -297,9 +300,6 @@ h1{font-weight:800}
       <div class="hero-art" id="heroArt2"></div>
       <i class="hero-strip" aria-hidden="true"></i>
     </div>
-    <div class="sec-head"><h2 class="sec-title">Modul operasional</h2><span class="sec-note" id="secNote"></span></div>
-    <div class="sub-head"><i></i><span id="roleGroup">Peran</span></div>
-    <div class="cards" id="modCards"></div>
   </section>
   <!-- RINGKASAN -->
   <section class="view" data-view="ringkasan">
@@ -782,30 +782,29 @@ function renderRoleCards(){
 function renderPortal(){
   const r=ROLES[role]; if(!r) return;
   $("#roleName").textContent=r.nama; $("#heroRole").textContent="Masuk sebagai "+r.nama;
-  $("#roleGroup").textContent=r.grup; $("#secNote").textContent=r.mods.filter(m=>!MODS[m].soon).length+" modul aktif · data ilustratif";
   const th=threshold(); const risk=buildAlerts().filter(a=>a.sev==="bad").length;
   $("#heroStats").innerHTML=`<div><b>${fmt(CALL.teuWeek)} TEU</b><span>terkonsolidasi minggu ini</span></div><div><b>${Math.round(CALL.teuWeek/th*100)}%</b><span>dari ambang direct call</span></div><div><b>${risk}</b><span>peringatan kritis</span></div>`;
-  $("#modCards").innerHTML=r.mods.map(m=>{const M=MODS[m];const il=M.soon?ILL.soon:ILL[m];
-    return `<${M.soon?"div":"button"} class="card${M.soon?" soon":""}" ${M.soon?"":`data-go="${m}"`} style="--tint:${il.tint}"><div class="ill">${il.svg}</div><div class="ct"><b>${M.t}</b><small>${M.sub}</small></div><span class="tag">${M.soon?"Tahap berikutnya":M.tag()}</span><span class="desc">${M.d}</span><span class="go">${M.soon?"Coming Soon":"Buka modul ›"}</span></${M.soon?"div":"button"}>`}).join("");
-  $("#modCards").querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.go)));
-  document.querySelectorAll("#modNav .tab").forEach(t=>{t.hidden=t.dataset.v!=="beranda"&&!r.mods.includes(t.dataset.v)});
+  $("#soonTabs").innerHTML=r.mods.filter(m=>MODS[m].soon).map(m=>`<span class="soon-tab" title="${MODS[m].d}">${MODS[m].t}<em>Segera</em></span>`).join("");
+  document.querySelectorAll("#modNav .tab").forEach(t=>{t.hidden=!r.mods.includes(t.dataset.v)});
 }
-function setRole(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();show("beranda")}
+const firstMod=()=>ROLES[role].mods.find(m=>!MODS[m].soon);
+function setRole(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();show(firstMod())}
 function show(v){
   if(!role) v="peran";
-  if(!["peran","beranda",...MODVIEWS].includes(v)) v="beranda";
+  if(role&&(v==="beranda"||!ROLES[role].mods.includes(v))) v=firstMod();
+  if(!["peran",...MODVIEWS].includes(v)) v="peran";
   document.querySelectorAll(".view").forEach(s=>s.hidden=s.dataset.view!==v);
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.v===v));
   $("#modNav").hidden=v==="peran"; $("#roleChip").hidden=!role||v==="peran";
   try{history.replaceState(null,"","#"+v)}catch(e){}
   try{localStorage.setItem("kti-tab",v)}catch(e){}
-  if(v==="beranda") renderPortal();
+  $("#roleHero").hidden=!(role&&v===firstMod()); if(!$("#roleHero").hidden) renderPortal();
   window.scrollTo(0,0);
   Object.values(charts).forEach(c=>c.resize());
 }
 document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>show(t.dataset.v)));
 $("#roleChip").addEventListener("click",()=>show("peran"));
-$("#brandLink").addEventListener("click",e=>{e.preventDefault();show(role?"beranda":"peran")});
+$("#brandLink").addEventListener("click",e=>{e.preventDefault();show(role?firstMod():"peran")});
 $("#scenSeg").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{scen=b.dataset.s;$("#scenSeg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));const T=chartTheme();if(T)drawProj(T)}));
 ["sVol","sCall","sSave"].forEach(id=>$("#"+id).addEventListener("input",onSim));
 
@@ -814,7 +813,7 @@ $("#heroArt1").innerHTML=HERO_ART; $("#heroArt2").innerHTML=HERO_ART;
 renderCutLabel(); tick(); setInterval(tick,1000);
 readSim(); renderKPIs(); renderNodeTables(); drawMap(); renderPartners(); renderFleet(); renderAlerts(); renderRoleCards(); renderPortal();
 let start=(location.hash||"").slice(1); if(!start){try{start=localStorage.getItem("kti-tab")||""}catch(e){}}
-show(start||"beranda");
+show(start||"peran");
 drawAll();
 })();
 </script>
