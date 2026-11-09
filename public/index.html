@@ -7,6 +7,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
 <style>
 /* Bahasa desain: kanvas putih dan parchment, satu aksen biru, kartu hairline tanpa bayangan. Tema terang saja. */
@@ -278,6 +279,84 @@ footer.foot{background:var(--parchment);border-top:1px solid var(--hair);padding
 footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
+
+/* ===== Live tracker ===== */
+.trk-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:8px 20px}
+.trk-head .sub{margin-bottom:16px}
+.live-pill{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--ink);background:var(--parchment);border-radius:999px;padding:6px 12px;white-space:nowrap}
+.live-pill i{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(36,138,61,.5);animation:livepulse 1.6s infinite}
+@keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(36,138,61,.45)}70%{box-shadow:0 0 0 8px rgba(36,138,61,0)}100%{box-shadow:0 0 0 0 rgba(36,138,61,0)}}
+.trk-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px}
+@media (max-width:980px){.trk-grid{grid-template-columns:1fr}}
+.trk-mapwrap{position:relative;border-radius:var(--r-inner);overflow:hidden;border:1px solid var(--hair);background:#e9eef2;min-height:560px}
+.trk-map{position:absolute;inset:0;z-index:1}
+.trk-map .leaflet-control-attribution{font-size:10px}
+.trk-ctl{position:absolute;z-index:500;top:12px;left:12px;width:min(340px,calc(100% - 24px));background:rgba(255,255,255,.96);border-radius:14px;border:1px solid var(--hair);overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.trk-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--divider);cursor:pointer}
+.trk-row select{flex:1;min-width:0;appearance:none;-webkit-appearance:none;border:0;background:transparent;font:600 15px var(--f-body);letter-spacing:-.016em;color:var(--ink);padding:4px 18px 4px 0;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 9px) 50%,calc(100% - 4px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.trk-row select:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
+.trk-ic{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none;color:#fff}
+.trk-ic svg{width:17px;height:17px}
+.ic-hub{background:var(--blue)}
+.ic-route{background:#b25e00}
+.ic-brand{background:#fff;color:var(--blue);border-radius:8px}
+.trk-brand{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--blue-soft);color:var(--blue);font-weight:700;font-size:15px;letter-spacing:.02em;text-transform:uppercase}
+.trk-brand b{margin-left:auto;font-size:12px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--ink)}
+.trk-legend{position:absolute;z-index:500;left:12px;bottom:12px;display:flex;flex-wrap:wrap;gap:6px 14px;background:rgba(255,255,255,.94);border:1px solid var(--hair);border-radius:999px;padding:7px 14px;font-size:12px;color:var(--ink-80);max-width:calc(100% - 24px)}
+.trk-legend span{display:inline-flex;align-items:center;gap:6px}
+.lg{display:inline-block}
+.lg-sea{width:18px;border-top:3px dashed var(--blue)}
+.lg-road{width:18px;border-top:3px solid #3a3a3c}
+.lg-hub{width:10px;height:10px;border-radius:50%;background:#fff;border:3px solid var(--blue)}
+.lg-mnp{width:11px;height:11px;background:var(--ink);transform:rotate(45deg);border-radius:2px}
+.trk-fallback{position:absolute;inset:auto 12px 56px 12px;z-index:600;background:#fff;border:1px solid var(--hair);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted)}
+/* route lines */
+.rt{stroke-linecap:round;stroke-linejoin:round}
+.rt-sea{stroke-dasharray:10 10;animation:rtflow 1.2s linear infinite}
+.rt-road{stroke-dasharray:14 8;animation:rtflow 1.4s linear infinite}
+@keyframes rtflow{to{stroke-dashoffset:-20}}
+@media (prefers-reduced-motion:reduce){.rt-sea,.rt-road,.live-pill i,.veh.sel .veh-b{animation:none}}
+/* vehicle + hub markers */
+.veh{background:none;border:0}
+.veh-b{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#fff;border:2px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.28);transition:transform .2s}
+.veh-b svg{width:20px;height:20px}
+.veh.sea .veh-b{background:var(--blue)}
+.veh.road .veh-b{background:#3a3a3c}
+.veh.risk .veh-b{background:var(--bad)}
+.veh.done .veh-b{background:var(--good)}
+.veh.sel .veh-b{transform:scale(1.18);animation:selpulse 1.4s infinite}
+@keyframes selpulse{0%{box-shadow:0 0 0 0 rgba(0,102,204,.45),0 3px 10px rgba(0,0,0,.28)}70%{box-shadow:0 0 0 12px rgba(0,102,204,0),0 3px 10px rgba(0,0,0,.28)}100%{box-shadow:0 0 0 0 rgba(0,102,204,0),0 3px 10px rgba(0,0,0,.28)}}
+.veh-tag{position:absolute;left:50%;top:38px;transform:translateX(-50%);white-space:nowrap;font:600 11px var(--f-body);color:var(--ink);background:rgba(255,255,255,.95);border:1px solid var(--hair);border-radius:6px;padding:1px 6px}
+.hubm{background:none;border:0}
+.hubm i{display:block;width:14px;height:14px;border-radius:50%;background:#fff;border:3.5px solid var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.hubm.road i{border-color:#3a3a3c}
+.hubm b{position:absolute;left:20px;top:-2px;white-space:nowrap;font:600 12px var(--f-body);color:var(--ink);text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff}
+.mnpm{background:none;border:0}
+.mnpm i{display:block;width:20px;height:20px;background:var(--ink);border:3px solid #fff;border-radius:4px;transform:rotate(45deg);box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.mnpm b{position:absolute;right:30px;top:0;white-space:nowrap;font:700 13px var(--f-body);color:var(--ink);text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff}
+.leaflet-popup-content{font:14px/1.43 var(--f-body);color:var(--ink);margin:12px 14px}
+.leaflet-popup-content b{font-weight:600}
+/* side list */
+.trk-side{display:flex;flex-direction:column;min-width:0;max-height:560px}
+.trk-side-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:0 2px 10px;font-size:14px}
+.trk-side-head .muted{font-size:12px;font-variant-numeric:tabular-nums}
+.trk-list{list-style:none;margin:0;padding:0;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.trk-item{border:1px solid var(--hair);border-radius:14px;padding:12px 14px;cursor:pointer;display:grid;gap:6px;background:#fff}
+.trk-item:hover{border-color:var(--chip-gray)}
+.trk-item.sel{border:2px solid var(--focus);padding:11px 13px}
+.trk-item:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.trk-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.trk-top b{font-size:15px;font-weight:600;letter-spacing:-.016em}
+.trk-top span{font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.trk-where{font-size:13px;color:var(--ink-80);line-height:1.38}
+.trk-bar{position:relative;height:6px;border-radius:3px;background:var(--parchment);overflow:hidden}
+.trk-bar i{position:absolute;inset:0 auto 0 0;border-radius:3px;background:var(--blue)}
+.trk-item.road .trk-bar i{background:#3a3a3c}
+.trk-item.risk .trk-bar i{background:var(--bad)}
+.trk-item.done .trk-bar i{background:var(--good)}
+.trk-meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+@media (max-width:980px){.trk-side{max-height:none}.trk-list{max-height:420px}}
+@media (max-width:640px){.trk-mapwrap{min-height:460px}.trk-legend{border-radius:12px}}
 /* ===== Model 3D ===== */
 .m3d-head,.m3d-frame{grid-column:1/-1;min-width:0}
 .m3d-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:16px}
@@ -424,6 +503,36 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
 
   <!-- ARMADA -->
   <section class="view wrap" data-view="armada" hidden>
+    <div class="panel c12 trk-panel">
+      <div class="trk-head">
+        <div>
+          <h2>Live tracker armada</h2>
+          <p class="sub">Posisi feeder dan truk menuju MNP, diperbarui setiap detik. Pilih unit untuk melihat sudah sampai mana.</p>
+        </div>
+        <span class="live-pill"><i></i>Live · simulasi waktu dipercepat</span>
+      </div>
+      <div class="trk-grid">
+        <div class="trk-mapwrap">
+          <div id="trkMap" class="trk-map" role="application" aria-label="Peta posisi armada menuju Makassar New Port"></div>
+          <div class="trk-ctl">
+            <label class="trk-row" for="trkHub"><span class="trk-ic ic-hub" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 2a6 6 0 0 1 6 6c0 4.6-6 10-6 10S4 12.6 4 8a6 6 0 0 1 6-6z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="8" r="2.2" fill="currentColor"/></svg></span><select id="trkHub"></select></label>
+            <label class="trk-row" for="trkMode"><span class="trk-ic ic-route" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4 16c3-6 9-6 12-12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="2 3" stroke-linecap="round"/><circle cx="4" cy="16" r="2" fill="currentColor"/><circle cx="16" cy="4" r="2" fill="currentColor"/></svg></span><select id="trkMode"><option value="all">Semua jalur</option><option value="sea">Feeder laut</option><option value="road">Truk darat</option></select></label>
+            <div class="trk-brand"><span class="trk-ic ic-brand" aria-hidden="true"><svg viewBox="0 0 20 20"><rect x="2" y="7" width="11" height="7" rx="1.5" fill="currentColor"/><path d="M13 9h3l2 2.5V14h-5z" fill="currentColor"/><circle cx="6" cy="15.5" r="1.6" fill="#fff"/><circle cx="15" cy="15.5" r="1.6" fill="#fff"/></svg></span><span>MNP Tracker</span><b id="trkCount"></b></div>
+          </div>
+          <div class="trk-legend">
+            <span><i class="lg lg-sea"></i>Feeder laut</span>
+            <span><i class="lg lg-road"></i>Truk darat</span>
+            <span><i class="lg lg-hub"></i>Titik konsolidasi</span>
+            <span><i class="lg lg-mnp"></i>MNP</span>
+          </div>
+          <div class="trk-fallback" id="trkFallback" hidden>Peta belum dapat dimuat karena pustaka Leaflet atau tile peta tidak terjangkau. Daftar posisi di samping tetap diperbarui.</div>
+        </div>
+        <div class="trk-side">
+          <div class="trk-side-head"><b>Unit dalam perjalanan</b><span id="trkClock" class="muted"></span></div>
+          <ul class="trk-list" id="trkList"></ul>
+        </div>
+      </div>
+    </div>
     <div class="panel c12">
       <h2>Alur status unit</h2>
       <p class="sub">Setiap transisi tercatat dengan waktu dan lokasi geofence sehingga dwell dan ketepatan waktu dihitung otomatis.</p>
@@ -489,6 +598,7 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function(){
 "use strict";
@@ -739,6 +849,113 @@ function renderFleet(){
     return `<tr><td class="unit">${u.id}<small>${u.nama} · ${u.tipe}</small></td><td>${n.nama}</td><td class="num">${u.teu}</td><td>${pillFor(lvl,st)}</td><td><div class="prog" style="--st:${col}"><i style="width:${u.prog*100}%"></i></div></td><td class="num">${u.st==="ARRIVED_MNP"?"tiba":u.eta+" jam"}${u.slip?` <span class="muted">(+${u.slip})</span>`:""}</td><td>${cut}</td></tr>`}).join("")+"</tbody>";
 }
 
+
+/* ================= LIVE TRACKER ================= */
+// Rute skematik [lat, lon]; titik bernama menjadi checkpoint "sudah sampai mana".
+const MNP_LL=[-5.103,119.395];
+const SEA_TAIL=[["Selat Selayar",-5.68,120.42],[null,-5.76,120.0],["Perairan Jeneponto",-5.74,119.62],[null,-5.62,119.27],["Perairan Takalar",-5.35,119.24],[null,-5.16,119.31],["MNP",MNP_LL[0],MNP_LL[1]]];
+const TRK_ROUTES={
+ imip:[["IMIP Morowali",-2.80,122.17],[null,-3.15,122.55],["Teluk Tolo",-3.75,123.05],[null,-4.35,123.32],["Timur Pulau Buton",-5.2,123.35],[null,-5.9,123.0],["Selatan Pulau Buton",-6.0,122.5],[null,-6.0,121.5],["Laut Flores",-5.9,120.9],...SEA_TAIL],
+ pomalaa:[["Pomalaa",-4.18,121.60],[null,-4.45,121.35],["Teluk Bone",-5.0,121.0],[null,-5.45,120.75],...SEA_TAIL],
+ kendari:[["Kendari",-3.97,122.51],[null,-4.02,122.78],[null,-4.35,123.32],["Timur Pulau Buton",-5.2,123.35],[null,-5.9,123.0],["Selatan Pulau Buton",-6.0,122.5],[null,-6.0,121.5],["Laut Flores",-5.9,120.9],...SEA_TAIL],
+ baubau:[["Bau-Bau",-5.47,122.61],["Selat Buton",-5.65,122.52],[null,-5.95,122.3],[null,-6.0,121.5],["Laut Flores",-5.9,120.9],...SEA_TAIL],
+ bitung:[["Bitung",1.44,125.18],[null,1.2,125.32],["Laut Maluku",0.35,125.4],[null,-1.0,124.6],["Timur Kepulauan Banggai",-2.0,124.0],[null,-3.2,123.6],[null,-4.2,123.45],["Timur Pulau Buton",-5.2,123.35],[null,-5.9,123.0],["Selatan Pulau Buton",-6.0,122.5],[null,-6.0,121.5],["Laut Flores",-5.9,120.9],...SEA_TAIL],
+ palopo:[["Palopo",-2.99,120.19],["Belopa",-3.38,120.37],[null,-3.48,120.0],["Enrekang",-3.56,119.78],["Sidrap",-3.85,119.80],["Parepare",-4.01,119.63],["Barru",-4.41,119.62],["Pangkep",-4.83,119.55],["Maros",-5.0,119.57],[null,-5.08,119.47],["MNP",MNP_LL[0],MNP_LL[1]]],
+ parepare:[["Parepare",-4.01,119.63],["Barru",-4.41,119.62],["Pangkep",-4.83,119.55],["Maros",-5.0,119.57],[null,-5.08,119.47],["MNP",MNP_LL[0],MNP_LL[1]]],
+ sulsel:[["Bulukumba",-5.55,120.20],["Bantaeng",-5.54,119.95],["Jeneponto",-5.68,119.73],["Takalar",-5.42,119.44],["Sungguminasa",-5.20,119.45],[null,-5.13,119.42],["MNP",MNP_LL[0],MNP_LL[1]]],
+ kima:[["KIMA Maros",-5.02,119.58],[null,-5.08,119.47],["MNP",MNP_LL[0],MNP_LL[1]]]
+};
+const VEH_SVG={sea:'<svg viewBox="0 0 24 24"><path d="M3 15h18l-2.5 4.5h-13z" fill="currentColor"/><rect x="6" y="10" width="4" height="4" rx=".6" fill="currentColor"/><rect x="11" y="10" width="4" height="4" rx=".6" fill="currentColor"/><rect x="8.5" y="6" width="4" height="3.4" rx=".6" fill="currentColor"/><rect x="16.5" y="8" width="2" height="6" rx=".5" fill="currentColor"/></svg>',
+ road:'<svg viewBox="0 0 24 24"><rect x="2" y="8" width="13" height="8" rx="1.4" fill="currentColor"/><path d="M15 10.5h3.6l2.4 3V16h-6z" fill="currentColor"/><circle cx="6.5" cy="17.5" r="1.9" fill="currentColor"/><circle cx="17.5" cy="17.5" r="1.9" fill="currentColor"/></svg>'};
+function hav(a,b){const R=6371,r=Math.PI/180,dLa=(b[0]-a[0])*r,dLo=(b[1]-a[1])*r,x=Math.sin(dLa/2)**2+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
+const ROUTE_GEO={};
+Object.entries(TRK_ROUTES).forEach(([k,pts])=>{const ll=pts.map(p=>[p[1],p[2]]);const cum=[0];for(let i=1;i<ll.length;i++)cum.push(cum[i-1]+hav(ll[i-1],ll[i]));ROUTE_GEO[k]={pts,ll,cum,len:cum[cum.length-1]};});
+function posAt(k,f){const g=ROUTE_GEO[k];const d=Math.max(0,Math.min(1,f))*g.len;let i=1;while(i<g.cum.length-1&&g.cum[i]<d)i++;const seg=g.cum[i]-g.cum[i-1]||1,t=(d-g.cum[i-1])/seg,a=g.ll[i-1],b=g.ll[i];return {ll:[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t],i,d};}
+function whereAt(k,f){const g=ROUTE_GEO[k];const {i,d}=posAt(k,f);let prev=null,next=null;for(let j=i-1;j>=0;j--){if(g.pts[j][0]){prev=g.pts[j][0];break;}}for(let j=i;j<g.pts.length;j++){if(g.pts[j][0]&&g.cum[j]>d+.5){next={n:g.pts[j][0],km:g.cum[j]-d};break;}}return {prev,next,left:g.len-d};}
+// state live per unit: prog awal dari FLEET, durasi sisa = eta jam; 1 detik nyata = 6 menit simulasi
+const SIM_H_PER_SEC=0.1;
+const LIVE=FLEET.map(u=>{const moving=["SAILING","IN_TRANSIT"].includes(u.st);const f0=u.st==="ARRIVED_MNP"?1:(moving?u.prog:0);const total=f0<1?Math.max(u.eta,.5)/(1-f0):1;return {u,f:f0,moving,total,start:f0,eta0:u.eta};});
+let trkMap=null,trkLayers={},trkSel=null,trkHub="",trkMode="all",trkSimH=0;
+function liveEta(v){return v.f>=1?0:Math.max(0,(1-v.f)*v.total);}
+function liveRisk(v){return !!(v.u.hold||v.u.slip>4||(v.f<1&&liveEta(v)>hoursToCut()));}
+function liveCls(v){const m=node(v.u.asal).moda;return m+(v.f>=1?" done":liveRisk(v)?" risk":"");}
+function liveVisible(v){const m=node(v.u.asal).moda;return (trkMode==="all"||trkMode===m)&&(!trkHub||v.u.asal===trkHub);}
+function fmtH(h){if(h<=0)return "tiba";const H=Math.floor(h),M=Math.round((h-H)*60);return H?`${H} j ${String(M).padStart(2,"0")} m`:`${M} m`;}
+function statusText(v){if(v.f>=1)return "Tiba di MNP";if(v.u.hold)return "Tertahan dokumen";if(!v.moving)return ({LOADED:"Muat selesai, menunggu berangkat",READY:"Siap berangkat",AT_HUB:"Menunggu di hub",STUFFED:"Stuffing selesai"})[v.u.st]||v.u.st;return node(v.u.asal).moda==="sea"?"Berlayar":"Di jalan";}
+function initTracker(){
+  const el=document.getElementById("trkMap"); if(!el) return;
+  const hubSel=$("#trkHub"); hubSel.innerHTML='<option value="">Pilih titik konsolidasi</option>'+NODES.map(n=>`<option value="${n.id}">${n.nama}</option>`).join("");
+  hubSel.addEventListener("change",()=>{trkHub=hubSel.value;applyTrkFilter(true);});
+  $("#trkMode").addEventListener("change",e=>{trkMode=e.target.value;applyTrkFilter(true);});
+  if(!window.L){$("#trkFallback").hidden=false;renderTrkList();return;}
+  trkMap=L.map(el,{zoomControl:true,attributionControl:true,scrollWheelZoom:true,worldCopyJump:false}).setView([-4.6,121.4],7);
+  trkMap.zoomControl.setPosition("topright");
+  const tiles=L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'}).addTo(trkMap);
+  let tileErr=0; tiles.on("tileerror",()=>{if(++tileErr>12){const fb=$("#trkFallback");fb.textContent="Tile peta tidak dapat dimuat dari jaringan ini. Posisi unit dan daftar di samping tetap diperbarui.";fb.hidden=false;}});
+  NODES.forEach(n=>{
+    const g=ROUTE_GEO[n.id]; if(!g) return;
+    const casing=L.polyline(g.ll,{color:"#ffffff",weight:9,opacity:.9,interactive:false}).addTo(trkMap);
+    const line=L.polyline(g.ll,{color:n.moda==="sea"?"#0066cc":"#3a3a3c",weight:4.5,opacity:.95,className:"rt rt-"+n.moda}).addTo(trkMap);
+    line.bindTooltip(`${n.nama} → MNP · ${Math.round(g.len)} km`,{sticky:true});
+    const hub=L.marker([n.lat,n.lon],{icon:L.divIcon({className:"hubm "+n.moda,html:`<i></i><b>${n.nama}</b>`,iconSize:[14,14],iconAnchor:[7,7]})}).addTo(trkMap);
+    hub.bindPopup(`<b>${n.nama}</b><br>${n.kom}<br><span style="color:#6e6e73">${fmt(n.teu)} TEU/minggu · ${n.moda==="sea"?"feeder laut":"truk darat"} · ${Math.round(g.len)} km ke MNP</span>`);
+    hub.on("click",()=>{trkHub=n.id;hubSel.value=n.id;applyTrkFilter(false);});
+    trkLayers["r_"+n.id]={casing,line,hub,moda:n.moda};
+  });
+  L.marker(MNP_LL,{icon:L.divIcon({className:"mnpm",html:"<i></i><b>Makassar New Port</b>",iconSize:[20,20],iconAnchor:[10,10]}),zIndexOffset:900}).addTo(trkMap).bindPopup("<b>Makassar New Port</b><br>Tujuan konsolidasi dan direct call");
+  LIVE.forEach(v=>{
+    const m=node(v.u.asal).moda;
+    const mk=L.marker(posAt(v.u.asal,v.f).ll,{icon:L.divIcon({className:"veh "+liveCls(v),html:`<div class="veh-b">${VEH_SVG[m]}</div><span class="veh-tag">${v.u.id}</span>`,iconSize:[34,34],iconAnchor:[17,17]}),zIndexOffset:1000}).addTo(trkMap);
+    mk.on("click",()=>selectUnit(v.u.id,false));
+    v.mk=mk;
+  });
+  applyTrkFilter(true);
+}
+function applyTrkFilter(fit){
+  if(trkMap){
+    const bounds=[];
+    NODES.forEach(n=>{const L_=trkLayers["r_"+n.id];if(!L_)return;const on=(trkMode==="all"||trkMode===n.moda)&&(!trkHub||trkHub===n.id);
+      [L_.casing,L_.line,L_.hub].forEach(l=>{if(on&&!trkMap.hasLayer(l))l.addTo(trkMap);if(!on&&trkMap.hasLayer(l))trkMap.removeLayer(l);});
+      if(on)ROUTE_GEO[n.id].ll.forEach(p=>bounds.push(p));});
+    LIVE.forEach(v=>{if(!v.mk)return;const on=liveVisible(v);if(on&&!trkMap.hasLayer(v.mk))v.mk.addTo(trkMap);if(!on&&trkMap.hasLayer(v.mk))trkMap.removeLayer(v.mk);});
+    if(fit&&bounds.length){bounds.push(MNP_LL);trkMap.fitBounds(bounds,{padding:[40,40],paddingTopLeft:[innerWidth>700?360:20,40],maxZoom:10});}
+  }
+  renderTrkList();
+}
+function selectUnit(id,fly){
+  trkSel=trkSel===id&&!fly?null:id;
+  const v=LIVE.find(x=>x.u.id===id);
+  if(trkMap&&v&&trkSel){const p=posAt(v.u.asal,v.f).ll;if(fly)trkMap.flyTo(p,Math.max(trkMap.getZoom(),9),{duration:.8});v.mk.bindPopup(unitPopup(v),{autoPanPaddingTopLeft:[innerWidth>700?380:20,30],autoPanPaddingBottomRight:[30,60]}).openPopup();}
+  if(!trkSel&&v&&v.mk)v.mk.closePopup();
+  tickTracker(0);
+}
+function unitPopup(v){const w=whereAt(v.u.asal,v.f),n=node(v.u.asal);
+  return `<b>${v.u.id}</b> · ${v.u.nama}<br>${statusText(v)} dari ${n.nama} · ${v.u.teu} TEU<br>${v.f>=1?"Sudah sandar di MNP":`Posisi ${w.prev?"lewat "+w.prev:"baru berangkat"}${w.next?", menuju "+w.next.n+" ("+Math.round(w.next.km)+" km)":""}`}<br><span style="color:#6e6e73">Sisa ${Math.round(w.left)} km · ETA ${fmtH(liveEta(v))}</span>`;}
+function renderTrkList(){
+  const list=LIVE.filter(liveVisible).sort((a,b)=>liveEta(a)-liveEta(b));
+  $("#trkCount").textContent=`${list.filter(v=>v.f<1).length} aktif`;
+  $("#trkList").innerHTML=list.map(v=>{const w=whereAt(v.u.asal,v.f),n=node(v.u.asal);
+    const where=v.f>=1?"Sudah sandar di MNP":`${w.prev?"Lewat "+w.prev:"Di "+n.nama}${w.next?" · menuju "+w.next.n:""}`;
+    return `<li class="trk-item ${liveCls(v)}${trkSel===v.u.id?" sel":""}" tabindex="0" data-u="${v.u.id}"><div class="trk-top"><b>${v.u.id}</b><span>${statusText(v)}</span></div><div class="trk-where">${where}</div><div class="trk-bar"><i style="width:${(v.f*100).toFixed(1)}%"></i></div><div class="trk-meta"><span>${n.nama} · ${v.u.teu} TEU</span><span>${v.f>=1?"tiba":"ETA "+fmtH(liveEta(v))+" · "+Math.round(w.left)+" km"}</span></div></li>`;}).join("")||'<li class="muted" style="font-size:13px">Tidak ada unit pada filter ini.</li>';
+  $("#trkList").querySelectorAll(".trk-item").forEach(li=>{li.addEventListener("click",()=>selectUnit(li.dataset.u,true));li.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectUnit(li.dataset.u,true);}});});
+}
+function tickTracker(dt){
+  trkSimH+=dt*SIM_H_PER_SEC;
+  LIVE.forEach(v=>{
+    if(v.moving&&v.f<1){v.f=Math.min(1,v.f+dt*SIM_H_PER_SEC/v.total);}
+    else if(!v.moving&&!v.u.hold&&v.f<1&&trkSimH>1.5+(v.eta0%5)*.6&&["LOADED","READY","AT_HUB"].includes(v.u.st)){v.moving=true;}
+    if(v.mk&&trkMap){v.mk.setLatLng(posAt(v.u.asal,v.f).ll);const el=v.mk.getElement();if(el){el.className=el.className.replace(/\b(sea|road|risk|done|sel)\b/g,"").replace(/\s+/g," ")+" "+liveCls(v)+(trkSel===v.u.id?" sel":"");}
+      if(trkSel===v.u.id&&v.mk.isPopupOpen())v.mk.setPopupContent(unitPopup(v));}
+  });
+  // demo berulang: bila semua unit bergerak sudah tiba, ulangi dari posisi awal
+  if(LIVE.every(v=>v.f>=1||!v.moving)&&LIVE.some(v=>v.moving)){LIVE.forEach(v=>{v.f=v.start;v.moving=["SAILING","IN_TRANSIT"].includes(v.u.st);});trkSimH=0;}
+  const c=$("#trkClock"); if(c) c.textContent="waktu simulasi +"+fmtH(trkSimH).replace("tiba","0 m");
+  renderTrkList();
+}
+let trkInit=false;
+function showTracker(){ if(!trkInit){trkInit=true;initTracker();} if(trkMap)setTimeout(()=>trkMap.invalidateSize(),60); }
+setInterval(()=>{ const sec=document.querySelector('[data-view="armada"]'); if(sec&&!sec.hidden&&trkInit) tickTracker(1); },1000);
+
 /* ================= CHARTS ================= */
 let charts={};
 function chartTheme(){
@@ -854,6 +1071,7 @@ function show(v){
   $("#subNav").hidden=v==="peran"; $("#roleChip").hidden=!role||v==="peran";
   try{history.replaceState(null,"","#"+v)}catch(e){}
   try{localStorage.setItem("kti-tab",v)}catch(e){}
+  if(v==="armada") showTracker();
   const f3=document.getElementById("m3dFrame"); if(v==="model3d"&&f3&&!f3.getAttribute("src")) f3.setAttribute("src","model-3d.html?holo=1");
 
   window.scrollTo(0,0);
