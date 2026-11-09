@@ -16,3 +16,8 @@ Prototipe dashboard Solusi 1 (Monitoring End-to-End) untuk case competition Maka
 4. Deploy. Setiap push ke `main` akan ter-deploy otomatis.
 
 Seluruh angka, nama partner, dan status kemitraan bersifat ilustratif.
+
+## API dummy tracker
+Tab Tracker Armada membaca `public/api/v1/fleet.json`, yaitu data fiktif yang formatnya meniru feed AIS untuk kapal (MMSI, kecepatan dalam knot) dan GPS telematika untuk truk (ID perangkat, km/j). Untuk beralih ke data asli:
+1. Siapkan endpoint dari penyedia AIS atau GPS (misalnya lewat Cloudflare Worker yang menyimpan API key sebagai secret, sehingga key tidak terlihat di halaman).
+2. Samakan formatnya dengan `fleet.json`, lalu ubah konstanta `TRK_API` di `public/index.html` ke alamat endpoint tersebut.

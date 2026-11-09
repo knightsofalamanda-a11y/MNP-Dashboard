@@ -281,6 +281,9 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
 
 
 /* ===== Live tracker ===== */
+.trk-badges{display:flex;flex-wrap:wrap;gap:8px}
+.src-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--blue);background:var(--blue-soft);border-radius:999px;padding:6px 12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.src-pill.off{color:var(--muted);background:var(--parchment)}
 .trk-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:8px 20px}
 .trk-head .sub{margin-bottom:16px}
 .live-pill{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--ink);background:var(--parchment);border-radius:999px;padding:6px 12px;white-space:nowrap}
@@ -509,7 +512,7 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
           <h2>Live tracker armada</h2>
           <p class="sub">Posisi feeder dan truk menuju MNP, diperbarui setiap detik. Pilih unit untuk melihat sudah sampai mana.</p>
         </div>
-        <span class="live-pill"><i></i>Live · simulasi waktu dipercepat</span>
+        <div class="trk-badges"><span class="src-pill" id="trkSrc" title="Sumber data tracker">Sumber data · memuat</span><span class="live-pill"><i></i>Live · simulasi waktu dipercepat</span></div>
       </div>
       <div class="trk-grid">
         <div class="trk-mapwrap">
@@ -930,7 +933,7 @@ function selectUnit(id,fly){
   tickTracker(0);
 }
 function unitPopup(v){const w=whereAt(v.u.asal,v.f),n=node(v.u.asal);
-  return `<b>${v.u.id}</b> · ${v.u.nama}<br>${statusText(v)} dari ${n.nama} · ${v.u.teu} TEU<br>${v.f>=1?"Sudah sandar di MNP":`Posisi ${w.prev?"lewat "+w.prev:"baru berangkat"}${w.next?", menuju "+w.next.n+" ("+Math.round(w.next.km)+" km)":""}`}<br><span style="color:#6e6e73">Sisa ${Math.round(w.left)} km · ETA ${fmtH(liveEta(v))}</span>`;}
+  return `<b>${v.u.id}</b> · ${v.u.nama}<br>${statusText(v)} dari ${n.nama} · ${v.u.teu} TEU<br>${v.f>=1?"Sudah sandar di MNP":`Posisi ${w.prev?"lewat "+w.prev:"baru berangkat"}${w.next?", menuju "+w.next.n+" ("+Math.round(w.next.km)+" km)":""}`}<br><span style="color:#6e6e73">Sisa ${Math.round(w.left)} km · ETA ${fmtH(liveEta(v))}</span>${feedLine(v)}`;}
 function renderTrkList(){
   const list=LIVE.filter(liveVisible).sort((a,b)=>liveEta(a)-liveEta(b));
   $("#trkCount").textContent=`${list.filter(v=>v.f<1).length} aktif`;
@@ -952,8 +955,20 @@ function tickTracker(dt){
   const c=$("#trkClock"); if(c) c.textContent="waktu simulasi +"+fmtH(trkSimH).replace("tiba","0 m");
   renderTrkList();
 }
+// API dummy: format meniru feed AIS (kapal) dan GPS telematika (truk). Ganti TRK_API ke endpoint asli bila API key sudah ada.
+const TRK_API="api/v1/fleet.json";
+let FEED={};
+async function loadFeed(){
+  const el=$("#trkSrc");
+  try{const r=await fetch(TRK_API,{cache:"no-store"});if(!r.ok)throw 0;const j=await r.json();(j.units||[]).forEach(u=>FEED[u.unit_id]=u);
+    el.textContent=`Sumber data · API dummy ${j.version||""} · ${(j.units||[]).length} unit`;el.classList.remove("off");el.title=j.note||"";}
+  catch(e){el.textContent="Sumber data · data bawaan halaman";el.classList.add("off");}
+  renderTrkList();
+}
+function feedLine(v){const f=FEED[v.u.id];if(!f)return "";const spd=v.moving&&v.f<1?f.speed:0;const id=f.mmsi?`MMSI ${f.mmsi}`:`Perangkat ${f.device_id}`;
+  return `<br><span style="color:#6e6e73">${f.feed} · ${id} · ${String(spd).replace(".",",")} ${f.speed_unit} · ping ${f.last_ping_min} menit lalu</span>`;}
 let trkInit=false;
-function showTracker(){ if(!trkInit){trkInit=true;initTracker();} if(trkMap)setTimeout(()=>trkMap.invalidateSize(),60); }
+function showTracker(){ if(!trkInit){trkInit=true;initTracker();loadFeed();} if(trkMap)setTimeout(()=>trkMap.invalidateSize(),60); }
 setInterval(()=>{ const sec=document.querySelector('[data-view="armada"]'); if(sec&&!sec.hidden&&trkInit) tickTracker(1); },1000);
 
 /* ================= CHARTS ================= */
