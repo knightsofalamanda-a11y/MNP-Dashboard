@@ -277,6 +277,16 @@ select{appearance:none;-webkit-appearance:none;background:var(--canvas) url("dat
 footer.foot{background:var(--parchment);border-top:1px solid var(--hair);padding:24px 0 40px;color:var(--ink-48);font-size:12px;line-height:1.5}
 footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ===== Model 3D ===== */
+.m3d-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:16px}
+.m3d-title{margin:0;font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1.14}
+.m3d-sub{margin:6px 0 0;max-width:68ch;color:#6e6e73;font-size:15px;line-height:1.47}
+.m3d-open{color:#0066cc;text-decoration:none;font-size:15px;white-space:nowrap}
+.m3d-open:hover{text-decoration:underline}
+.m3d-frame{position:relative;border-radius:18px;overflow:hidden;background:#020b16;border:1px solid #e0e0e0;height:calc(100vh - 230px);min-height:480px}
+.m3d-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+@media (max-width:640px){.m3d-frame{height:72vh;min-height:420px}.m3d-title{font-size:24px}}
 </style>
 </head>
 <body>
@@ -303,6 +313,7 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
       <button class="tab" role="tab" data-v="partner" id="t-partner">Partner</button>
       <button class="tab" role="tab" data-v="armada" id="t-armada">Tracker Armada</button>
       <button class="tab" role="tab" data-v="proyeksi" id="t-proyeksi">Proyeksi &amp; Direct Call</button>
+      <button class="tab" role="tab" data-v="model3d" id="t-model3d">Model 3D</button>
       <span id="soonTabs" class="soon-tabs"></span>
     </nav>
     <button class="role-chip" id="roleChip" hidden aria-label="Ganti peran"><span id="roleName">Peran</span><span class="chg">Ganti</span></button>
@@ -457,6 +468,16 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
       <p class="sub">Biaya tambahan direct call per TEU turun seiring volume. Di kanan titik potong, direct call lebih murah daripada transshipment.</p>
       <div class="chart-box"><canvas id="chBE" aria-label="Grafik titik impas direct call"></canvas></div>
     </div>
+  </section>
+  <section class="view wrap" data-view="model3d" hidden>
+    <div class="m3d-head">
+      <div>
+        <h2 class="m3d-title">Model 3D terminal</h2>
+        <p class="m3d-sub">Simulasi Makassar New Port dalam mode hologram. Seret untuk memutar, gulir untuk zoom, dan gunakan tombol di dalam model untuk tur, Digital Twin, atau skenario.</p>
+      </div>
+      <a class="m3d-open" href="model-3d.html?holo=1" target="_blank" rel="noopener">Buka layar penuh ›</a>
+    </div>
+    <div class="m3d-frame"><iframe id="m3dFrame" title="Model 3D Makassar New Port, mode hologram" allow="fullscreen"></iframe></div>
   </section>
 </main>
 
@@ -791,6 +812,7 @@ const MODS={
  jaringan:{t:"Jaringan Konsolidasi",sub:"Peta",d:"Koridor laut dan darat, kinerja tiap hub",tag:()=>`${NODES.length} titik KTI`},
  partner:{t:"Partner",sub:"Kemitraan",d:"Pipeline, scorecard, dan heatmap komitmen",tag:()=>`${PARTNERS.length} partner`},
  armada:{t:"Tracker Armada",sub:"Truk & feeder",d:"Posisi unit dan risiko terhadap cut-off",tag:()=>`${FLEET.filter(u=>u.st!=="ARRIVED_MNP").length} unit aktif`},
+ model3d:{t:"Model 3D",sub:"Hologram",d:"Simulasi terminal MNP dalam 3D dengan mode hologram dan Digital Twin",tag:()=>"mode hologram"},
  proyeksi:{t:"Proyeksi & Direct Call",sub:"Simulasi",d:"Tiga skenario volume dan titik impas",tag:()=>`ambang ${fmt(threshold())} TEU/minggu`},
  laporan:{t:"Laporan Bulanan",sub:"Ekspor",d:"Ringkasan kinerja untuk rapat direksi",soon:true},
  dermaga:{t:"Perencanaan Dermaga",sub:"Berth",d:"Alokasi tambatan untuk direct call",soon:true},
@@ -798,12 +820,12 @@ const MODS={
  dokumen:{t:"Dokumen & Bea Cukai",sub:"Kepatuhan",d:"Status PEB, karantina, dan SLA jalur prioritas",soon:true}
 };
 const ROLES={
- manajemen:{nama:"Manajemen MNP",grup:"Manajemen & Komersial",d:"Kinerja konsolidasi, partner, dan kelayakan direct call",mods:["ringkasan","proyeksi","partner","jaringan","armada","laporan"]},
- operator:{nama:"Operator Terminal MNP",grup:"Operasi Terminal",d:"Kedatangan armada dan kesiapan cut-off",mods:["armada","jaringan","ringkasan","dermaga"]},
- koordinator:{nama:"Koordinator Titik Konsolidasi",grup:"Hub Konsolidasi KTI",d:"Kinerja hub, dwell, dan unit yang berangkat",mods:["jaringan","armada","slot"]},
- partner:{nama:"Partner (Shipper & Carrier)",grup:"Shipper & Carrier",d:"Komitmen volume dan peluang direct call",mods:["partner","proyeksi","slot","dokumen"]}
+ manajemen:{nama:"Manajemen MNP",grup:"Manajemen & Komersial",d:"Kinerja konsolidasi, partner, dan kelayakan direct call",mods:["ringkasan","proyeksi","partner","jaringan","armada","model3d","laporan"]},
+ operator:{nama:"Operator Terminal MNP",grup:"Operasi Terminal",d:"Kedatangan armada dan kesiapan cut-off",mods:["armada","jaringan","ringkasan","model3d","dermaga"]},
+ koordinator:{nama:"Koordinator Titik Konsolidasi",grup:"Hub Konsolidasi KTI",d:"Kinerja hub, dwell, dan unit yang berangkat",mods:["jaringan","armada","model3d","slot"]},
+ partner:{nama:"Partner (Shipper & Carrier)",grup:"Shipper & Carrier",d:"Komitmen volume dan peluang direct call",mods:["partner","proyeksi","model3d","slot","dokumen"]}
 };
-const MODVIEWS=["ringkasan","jaringan","partner","armada","proyeksi"];
+const MODVIEWS=["ringkasan","jaringan","partner","armada","proyeksi","model3d"];
 let role=null; try{role=localStorage.getItem("mnp-role")}catch(e){} if(!ROLES[role]) role=null;
 
 function renderRoleCards(){
@@ -831,6 +853,7 @@ function show(v){
   $("#subNav").hidden=v==="peran"; $("#roleChip").hidden=!role||v==="peran";
   try{history.replaceState(null,"","#"+v)}catch(e){}
   try{localStorage.setItem("kti-tab",v)}catch(e){}
+  const f3=document.getElementById("m3dFrame"); if(v==="model3d"&&f3&&!f3.getAttribute("src")) f3.setAttribute("src","model-3d.html?holo=1");
 
   window.scrollTo(0,0);
   Object.values(charts).forEach(c=>c.resize());

@@ -1,0 +1,742 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>MNP 3D Overview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: full-bleed 3D diorama, HUD pinned to four corners, caption band bottom-center. Single light look by choice (matches the deck). */
+:root{
+  color-scheme: light;
+  --ink:#0e1a36; --ink-2:#4a5878; --sky:#d6e4ee; --panel:rgba(250,252,255,.9); --line:rgba(14,26,54,.12);
+  --blue:#2443b8; --blue-soft:#e3e9fb; --green:#16916a; --amber:#d98c12;
+  --display:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  --gx:max(16px, env(safe-area-inset-left,0px)); --gxr:max(16px, env(safe-area-inset-right,0px));
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--display);overflow:hidden;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
+#stage{position:fixed;inset:0}
+#stage canvas{display:block;width:100%;height:100%;touch-action:none}
+#labels{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.lbl{position:absolute;left:0;top:0;transform:translate(-50%,-100%);white-space:nowrap;font-size:11.5px;font-weight:600;
+  background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 8px 3px 7px;display:flex;align-items:center;gap:6px;
+  box-shadow:0 2px 8px rgba(14,26,54,.12);transition:opacity .3s}
+.lbl::after{content:"";position:absolute;left:50%;bottom:-7px;width:1px;height:7px;background:var(--ink-2)}
+.lbl i{width:7px;height:7px;border-radius:50%;background:var(--blue);flex:none}
+.lbl.twin{background:var(--ink);color:#fff;border-color:transparent;font-family:var(--mono);font-size:11px}
+.lbl.twin i{background:#7fb2ff}
+.lbl.ok i{background:#3fd49a}.lbl.warn i{background:#ffb93b}
+.lbl.big{font-size:13px;padding:5px 10px}
+.hud{position:fixed;z-index:5;transition:opacity .35s}
+body.rec .hud{opacity:0;pointer-events:none}
+#brand{top:calc(env(safe-area-inset-top,0px) + 16px);left:var(--gx);max-width:min(440px,calc(100vw - 32px))}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:700}
+h1{margin:4px 0 2px;font-size:clamp(22px,3.2vw,34px);line-height:1.05;font-weight:800;letter-spacing:-.02em;text-wrap:balance}
+.sub{font-size:13px;color:var(--ink-2);margin:0;max-width:40ch}
+#stats{top:calc(env(safe-area-inset-top,0px) + 16px);right:var(--gxr);display:grid;grid-template-columns:repeat(4,auto);gap:1px;background:var(--line);border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.st{background:var(--panel);padding:8px 12px;min-width:0}
+.st b{display:block;font-family:var(--mono);font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.st span{font-size:10.5px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+#controls{left:var(--gx);bottom:calc(env(safe-area-inset-bottom,0px) + 16px);display:flex;flex-wrap:wrap;gap:8px;max-width:calc(100vw - 32px)}
+button{font:600 13px/1 var(--display);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:10px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:0 2px 8px rgba(14,26,54,.08)}
+button:hover{border-color:var(--blue)}
+button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--blue);color:#fff;border-color:var(--blue)}
+button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.primary[aria-pressed="true"]{background:#b23a2e;border-color:#b23a2e}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;border-radius:0;box-shadow:none;background:transparent}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+kbd{font-family:var(--mono);font-size:10.5px;opacity:.7}
+#twin{right:var(--gxr);bottom:calc(env(safe-area-inset-bottom,0px) + 16px);width:min(300px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:10px;box-shadow:0 6px 24px rgba(14,26,54,.14)}
+#twin h2{margin:0;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.kpi{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:12.5px;color:var(--ink-2)}
+.kpi b{font-family:var(--mono);font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums}
+.ramp{height:8px;border-radius:4px;background:linear-gradient(90deg,#dfe8f7,#7d9de6,#1d3596)}
+.rampl{display:flex;justify-content:space-between;font:500 10.5px var(--mono);color:var(--ink-2);margin-top:3px}
+.leg{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2)}
+.leg span{display:inline-flex;align-items:center;gap:5px}
+.dot{width:9px;height:9px;border-radius:50%}
+.alert{font-size:12px;border-radius:8px;padding:8px 10px;background:#eef6f2;color:#0d5d44;border:1px solid #bfe3d3;line-height:1.35}
+.alert.warn{background:#fdf3e2;color:#7a4b05;border-color:#f1d6a6}
+.src{font-size:10.5px;color:var(--ink-2)}
+#caption{position:fixed;z-index:6;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 74px);transform:translateX(-50%);
+  width:min(760px,calc(100vw - 32px));text-align:center;pointer-events:none;transition:opacity .4s}
+#caption .cap{display:inline-block;background:rgba(14,26,54,.86);color:#fff;font-weight:600;font-size:clamp(15px,2vw,21px);line-height:1.3;padding:11px 18px;border-radius:10px;text-wrap:balance}
+#caption .k{display:block;font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#9fb8ff;margin-bottom:4px}
+#bar{height:3px;background:rgba(255,255,255,.25);border-radius:2px;margin-top:8px;overflow:hidden}
+#bar div{height:100%;width:0;background:#9fb8ff}
+body.rec #caption{bottom:calc(env(safe-area-inset-bottom,0px) + 36px)}
+#show{position:fixed;z-index:7;right:var(--gxr);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);opacity:0;pointer-events:none;font-size:11px;padding:6px 9px}
+body.rec #show{opacity:.35;pointer-events:auto}
+body.rec #show:hover{opacity:1}
+#hint{position:fixed;z-index:4;left:50%;top:calc(env(safe-area-inset-top,0px) + 16px);transform:translateX(-50%);font-size:11.5px;color:var(--ink-2);background:var(--panel);padding:5px 10px;border-radius:20px;border:1px solid var(--line)}
+@media (max-width:1360px){#hint{display:none}}
+@media (max-width:980px){#stats{grid-template-columns:repeat(2,auto)}}
+@media (max-width:700px){
+  #stats{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 128px);right:var(--gxr);display:none}
+  #twin{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 112px);padding:10px 12px;gap:7px}
+  #twin .src,#twin .leg{display:none}
+  #caption{bottom:calc(env(safe-area-inset-bottom,0px) + 116px)}
+  .lbl{font-size:10px}
+}
+/* Hologram mode: tokens flip to a dark projection palette */
+body.holo{--ink:#dffaff;--ink-2:#86c3d3;--panel:rgba(3,18,32,.84);--line:rgba(71,230,255,.3);--blue:#47e6ff;--sky:#020b16}
+body.holo button{box-shadow:0 0 0 1px rgba(71,230,255,.12),0 0 18px rgba(71,230,255,.08)}
+body.holo button.primary,body.holo .seg button[aria-pressed="true"]{background:#47e6ff;color:#021420;border-color:#47e6ff}
+body.holo button[aria-pressed="true"]{background:rgba(71,230,255,.22);color:#dffaff;border-color:#47e6ff}
+body.holo .lbl{background:rgba(3,20,36,.78);color:#c9f7ff;border-color:rgba(71,230,255,.45);box-shadow:0 0 14px rgba(71,230,255,.18)}
+body.holo .lbl::after{background:#47e6ff}
+body.holo .lbl i{background:#47e6ff;box-shadow:0 0 6px #47e6ff}
+body.holo .lbl.twin{background:rgba(2,14,26,.94);color:#e9fdff;border-color:#47e6ff}
+body.holo .alert{background:rgba(63,212,154,.12);color:#9ff0cf;border-color:rgba(63,212,154,.4)}
+body.holo .alert.warn{background:rgba(255,185,59,.12);color:#ffd894;border-color:rgba(255,185,59,.4)}
+body.holo .ramp{background:linear-gradient(90deg,#0d3a52,#2aa9d6,#bff6ff)}
+body.holo h1{text-shadow:0 0 22px rgba(71,230,255,.45)}
+#holoFx{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .6s;overflow:hidden;
+  background:repeating-linear-gradient(0deg,rgba(71,230,255,.05) 0 1px,transparent 1px 3px),radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(0,6,14,.7) 100%)}
+#holoFx::after{content:"";position:absolute;left:0;right:0;height:22vh;top:-22vh;background:linear-gradient(180deg,transparent,rgba(71,230,255,.07),transparent);animation:sweep 5.5s linear infinite}
+@keyframes sweep{to{transform:translateY(144vh)}}
+body.holo #holoFx{opacity:1}
+@media (prefers-reduced-motion:reduce){.hud,.lbl,#caption,#holoFx{transition:none}#holoFx::after{animation:none;display:none}}
+#twin{position:fixed;z-index:5;transition:opacity .35s;top:calc(env(safe-area-inset-top,0px) + 92px);bottom:auto!important}
+#fade{position:fixed;inset:0;background:#020812;opacity:0;pointer-events:none;z-index:8}
+#caption{z-index:9}
+#caption .k em{font-style:normal;color:#c9d6ff;opacity:.75;letter-spacing:.08em}
+.tourbtn{display:inline-flex;gap:8px}
+@media (max-width:700px){#twin{display:none}}
+</style>
+
+<div id="stage"></div>
+<div id="holoFx"></div>
+<div id="labels"></div>
+
+<header class="hud" id="brand">
+  <div class="eyebrow">Pelindo Regional 4 · Proyek Strategis Nasional</div>
+  <h1>Makassar New Port</h1>
+  <p class="sub">Terminal 2 TPK New Makassar di Tallo, utara Kota Makassar. Seret untuk memutar, gulir untuk zoom.</p>
+</header>
+
+<section class="hud" id="stats" aria-label="Spesifikasi terminal">
+  <div class="st"><b>1.062 m</b><span>Dermaga terbangun</span></div>
+  <div class="st"><b>−16 m</b><span>Kedalaman LWS</span></div>
+  <div class="st"><b>2,5 jt</b><span>TEU/tahun desain</span></div>
+  <div class="st"><b>6 CC · 16 RTG</b><span>Alat bongkar muat</span></div>
+</section>
+
+<div class="hud" id="hint"><kbd>T</kbd> <kbd>L</kbd> tur · <kbd>R</kbd> sandar · <kbd>D</kbd> twin · <kbd>G</kbd> hologram · <kbd>H</kbd> rekam</div>
+
+<nav class="hud" id="controls" aria-label="Kontrol tampilan">
+  <span class="tourbtn">
+    <button class="primary" id="btnShort" aria-pressed="false">▶ Tur singkat 25 detik</button>
+    <button class="primary" id="btnLong" aria-pressed="false">▶ Tur lengkap 60 detik</button>
+  </span>
+  <button id="btnArrive">Ulangi kapal sandar</button>
+  <button id="btnTwin" aria-pressed="false">Digital Twin</button>
+  <button id="btnHolo" aria-pressed="false">Hologram</button>
+  <div class="seg" role="group" aria-label="Skenario">
+    <button id="scAsis" aria-pressed="true">As-Is</button>
+    <button id="scTobe" aria-pressed="false">Skenario 85%</button>
+  </div>
+  <button id="btnLbl" aria-pressed="true">Label</button>
+  <button id="btnRec" aria-pressed="false">Mode rekam</button>
+</nav>
+
+<aside id="twin" hidden>
+  <h2>Digital Twin · <span id="twScen">As-Is</span></h2>
+  <div class="kpi">Utilisasi dermaga <b id="kUtil">15,7%</b></div>
+  <div>
+    <div class="ramp"></div>
+    <div class="rampl"><span>0%</span><span>Okupansi per posisi sandar</span><span>100%</span></div>
+  </div>
+  <div class="kpi">QCC kompatibel 16–17 baris <b>2/6</b></div>
+  <div class="kpi">Truk eksternal aktif <b id="kTruck">7</b></div>
+  <div class="leg">
+    <span><i class="dot" style="background:#16916a"></i>QCC Post-Panamax</span>
+    <span><i class="dot" style="background:#d98c12"></i>QCC standar</span>
+    <span><i class="dot" style="background:#4f7bf0"></i>Arus data ICD</span>
+  </div>
+  <div class="alert" id="alert">Kapasitas dermaga masih longgar. Investasi crane baru belum diperlukan.</div>
+  <div class="src">Utilisasi rata-rata dari simulasi Simio tim. Okupansi per posisi sandar bersifat ilustratif.</div>
+</aside>
+
+<div id="fade"></div>
+<div id="caption" style="opacity:0"><span class="cap"><span class="k" id="capK">01 / 05</span><span id="capT"></span><div id="bar"><div></div></div></span></div>
+<button id="show">Tampilkan kontrol (H)</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+/* Scale: 1 unit = 10 m. x runs along the quay (x+ = north), z+ = landward (east), sea at z<0 (Selat Makassar). */
+const DECK=2, CL=1.22, CW=.244, CH=.26;
+const V=(x,y,z)=>new THREE.Vector3(x,y,z), P=(x,z,y=DECK)=>new THREE.Vector3(x,y,z);
+const rnd=(()=>{let s=11;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;}})();
+const ease=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;
+const lerp=(a,b,t)=>a+(b-a)*t;
+function approach(c,t,v,dt){const d=t-c,a=Math.abs(d);if(a<1e-4)return t;const s=Math.min(a,v*dt*Math.min(1,.18+a*1.4));return c+Math.sign(d)*s;}
+function lerpAngle(a,b,t){let d=((b-a+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;return a+d*t;}
+
+/* ---------- Renderer ---------- */
+const stage=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap; renderer.outputEncoding=THREE.sRGBEncoding;
+stage.appendChild(renderer.domElement);
+const scene=new THREE.Scene(); const SKY=0xd6e4ee;
+scene.background=new THREE.Color(SKY); scene.fog=new THREE.Fog(SKY,320,950);
+const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.5,3000);
+camera.position.set(-92,66,-92);
+const controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.target.set(-2,0,14); controls.enableDamping=true; controls.dampingFactor=.08; controls.maxPolarAngle=1.45; controls.minDistance=8; controls.maxDistance=520;
+scene.add(new THREE.HemisphereLight(0xffffff,0x6d8a99,.72));
+const sun=new THREE.DirectionalLight(0xfff1dc,1.05); sun.position.set(-120,190,-70); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-95,right:95,top:95,bottom:-95,near:10,far:600}); sun.shadow.bias=-.0006; sun.target.position.set(0,0,18); scene.add(sun,sun.target);
+
+const mats={}; function M(c){if(!mats[c])mats[c]=new THREE.MeshStandardMaterial({color:c,roughness:.82,metalness:.05});return mats[c];}
+const boxG=new THREE.BoxGeometry(1,1,1);
+function box(w,h,d,c,x,y,z,o={}){const m=new THREE.Mesh(boxG,o.mat||M(c));m.scale.set(w,h,d);m.position.set(x,y+h/2,z);m.castShadow=o.cast!==false;m.receiveShadow=true;(o.parent||scene).add(m);return m;}
+function rod(w,c){const m=new THREE.Mesh(boxG,M(c));m.userData.w=w;m.castShadow=true;scene.add(m);return m;}
+function stretch(m,a,b){m.position.copy(a).add(b).multiplyScalar(.5);m.scale.set(m.userData.w,m.userData.w,Math.max(a.distanceTo(b),.001));m.lookAt(b);}
+const PAL=[0xb5473b,0x2f6ea3,0xd29a2e,0x3d8a5e,0x7d8794,0xc9ccd1,0x8b3b2f,0x2a4f7a,0xe07b33,0x5b6b4e];
+const pal=()=>PAL[Math.floor(rnd()*PAL.length)];
+const ZERO=new THREE.Matrix4().makeScale(0,0,0), _o=new THREE.Object3D(), _c=new THREE.Color();
+const tmp=new THREE.Vector3(), tmp2=new THREE.Vector3();
+
+/* ---------- Sea, coast, city ---------- */
+const sea=new THREE.Mesh(new THREE.PlaneGeometry(3000,3000),new THREE.MeshStandardMaterial({color:0x2f7ea8,roughness:.32,metalness:.15}));
+sea.rotation.x=-Math.PI/2; sea.receiveShadow=true; scene.add(sea);
+const SHORE=135;
+const shallow=new THREE.Mesh(new THREE.PlaneGeometry(1400,30),new THREE.MeshStandardMaterial({color:0x5aa6bf,roughness:.4,transparent:true,opacity:.75}));
+shallow.rotation.x=-Math.PI/2; shallow.position.set(0,.05,SHORE-14); scene.add(shallow);
+box(1400,1.2,500,0xd9d3bd,0,-.2,SHORE+250,{cast:false});
+box(1400,.4,6,0xeee3c6,0,.6,SHORE+2,{cast:false});
+for(let i=0;i<300;i++){const x=(rnd()-.5)*640,z=SHORE+14+rnd()*230; if(x>30&&x<80&&z<215)continue; const h=1+rnd()*rnd()*9,w=3+rnd()*6,d=3+rnd()*6; box(w,h,d,[0xe6e1d6,0xd2cdc3,0xc9c2b3,0xece8df][i%4],x,1,z);}
+const treeG=new THREE.ConeGeometry(1.4,3.4,6);
+for(let i=0;i<150;i++){const x=(rnd()-.5)*700,z=SHORE+6+rnd()*14; if(x>40&&x<58)continue; const t=new THREE.Mesh(treeG,M(0x6f9a5c)); t.position.set(x,2.6,z); t.castShadow=true; scene.add(t);}
+// old terminal (TPM / Soekarno-Hatta), south along the coast
+box(34,1.6,16,0xcfccc4,-262,-.4,SHORE-6,{cast:false});
+for(let i=0;i<4;i++){const x=-276+i*8; box(.35,4,.35,0x6f86b8,x,1.2,SHORE-12); box(.35,4,.35,0x6f86b8,x,1.2,SHORE-9); box(.5,.3,9,0x6f86b8,x,5.2,SHORE-13.5);}
+
+/* ---------- Terminal platform (reclaimed, about 52 ha) ---------- */
+const QX0=-53, QX1=53;              // 1.062 m quay as built
+box(108,DECK+1,46,0xd8d5ce,0,-1,23,{cast:false});
+box(108,DECK+1.02,1.0,0x5d6675,0,-1,.2,{cast:false});
+for(const sx of [-54.6,54.6]) box(1.4,DECK+.4,46,0x7b7064,sx,-1,23,{cast:false});
+box(108,.3,1.4,0x77685a,0,-1,46.4,{cast:false});
+box(12,DECK+1,10,0xd8d5ce,48,-1,51,{cast:false}); // gate apron toward the toll road
+box(108,.04,6.2,0xc2c5ca,0,DECK,3.1,{cast:false});      // apron
+box(104,.04,32,0x9da2a9,-1,DECK,22.5,{cast:false});     // yard
+for(const z of [1.2,4.2]) box(106,.06,.16,0x3a3f48,0,DECK+.03,z,{cast:false});
+for(let x=-52;x<52;x+=4) box(2,.05,.1,0xf4f4f4,x,DECK+.02,7,{cast:false});
+for(let x=-52;x<=52;x+=2.6){ box(.35,.6,.22,0x1d2228,x,DECK-.8,-.05,{cast:false}); box(.22,.22,.22,0x2b3038,x,DECK,.45,{cast:false}); }
+// future extension toward the south, dashed outline
+const extZone=new THREE.Group(); scene.add(extZone);
+const ez=new THREE.Mesh(new THREE.PlaneGeometry(54,46),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.16,depthWrite:false}));
+ez.rotation.x=-Math.PI/2; ez.position.set(-81.5,.15,23); extZone.add(ez);
+const ezE=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(54,.01,46)),new THREE.LineDashedMaterial({color:0xffffff,dashSize:2,gapSize:1.5}));
+ezE.position.set(-81.5,.2,23); ezE.computeLineDistances(); extZone.add(ezE);
+
+/* ---------- Breakwater (rubble mound, north side) ---------- */
+const bwCurve=new THREE.CatmullRomCurve3([V(57,0,-2),V(64,0,-22),V(53,0,-45),V(30,0,-57),V(6,0,-61)]);
+const bwG=new THREE.CylinderGeometry(1.1,1.9,1.6,6,1), bwPts=bwCurve.getSpacedPoints(60);
+const bw=new THREE.InstancedMesh(bwG,M(0x6f7473),bwPts.length);
+bwPts.forEach((p,i)=>{_o.position.set(p.x,.3,p.z);_o.rotation.set(0,i*.7,0);_o.scale.set(1+rnd()*.4,1,1+rnd()*.4);_o.updateMatrix();bw.setMatrixAt(i,_o.matrix);});
+bw.castShadow=true; scene.add(bw);
+
+/* ---------- Toll access road (3,2 km, elevated) ---------- */
+const E=DECK+1.6;
+box(5.6,.35,98,0x8c9198,48.1,E-.35,121);
+box(5.6,.04,98,0x5c6169,48.1,E,121,{cast:false});
+for(let z=74;z<170;z+=8){ box(.7,E-.35,.7,0xb9bcc1,46.4,0,z); box(.7,E-.35,.7,0xb9bcc1,49.8,0,z); }
+const ramp1=box(5.6,.3,14.4,0x5c6169,48.1,DECK+.65,63); ramp1.rotation.x=-Math.atan2(1.6,14);
+const ramp2=box(5.6,.3,14.4,0x5c6169,48.1,2.15,177); ramp2.rotation.x=Math.atan2(2.6,14);
+box(30,.06,4,0x5c6169,63,1,186,{cast:false});
+for(let z=74;z<170;z+=4) box(.1,.03,1.4,0xf2f2f2,48.1,E+.02,z,{cast:false});
+// ICD / CFS compound on the mainland
+box(36,.08,22,0xa7aaae,62,1,196,{cast:false});
+box(14,3,8,0xe7e9ec,72,1,200); box(14.2,.3,8.2,0x16916a,72,4,200);
+const icdBoxes=[]; for(let r=0;r<6;r++)for(let s=0;s<8;s++)for(let t=0;t<1+((r+s)%3);t++) icdBoxes.push([52+s*1.28,1+CH/2+t*CH,191+r*.62,PAL[(r*3+s+t)%10]]);
+const icdIM=new THREE.InstancedMesh(boxG,new THREE.MeshStandardMaterial({roughness:.75}),icdBoxes.length);
+icdBoxes.forEach((b,i)=>{_o.position.set(b[0],b[1],b[2]);_o.rotation.set(0,0,0);_o.scale.set(CL,CH*.96,CW*.94);_o.updateMatrix();icdIM.setMatrixAt(i,_o.matrix);icdIM.setColorAt(i,_c.setHex(b[3]));});
+icdIM.castShadow=true; scene.add(icdIM);
+
+/* ---------- Buildings behind the yard ---------- */
+box(12,4.2,5,0xf3f4f6,-44,DECK,42.5); box(12.4,.3,5.4,0x2443b8,-44,DECK+4.2,42.5);
+for(let f=0;f<4;f++) box(12.05,.35,5.05,0x9fb3d6,-44,DECK+.6+f*.95,42.5,{cast:false});
+const tower=new THREE.Mesh(new THREE.CylinderGeometry(.8,1,7,12),M(0xf3f4f6)); tower.position.set(-35,DECK+3.5,42.5); tower.castShadow=true; scene.add(tower);
+const cab=new THREE.Mesh(new THREE.CylinderGeometry(1.6,1.25,1.4,12),new THREE.MeshStandardMaterial({color:0x2f5fa8,metalness:.4,roughness:.25})); cab.position.set(-35,DECK+7.6,42.5); cab.castShadow=true; scene.add(cab);
+box(3.4,.22,3.4,0xf3f4f6,-35,DECK+8.3,42.5);
+box(10,2.4,5,0xd7dbe1,2,DECK,42); box(7,1.6,4,0xd7dbe1,12,DECK,42.5);
+// tractor parking under solar canopy
+box(26,.04,3,0x8b9097,-18,DECK,39,{cast:false});
+for(let i=0;i<5;i++){ const p=box(5,.1,3.2,0x22345e,-28+i*5.2+2.5,DECK+1.35,39,{cast:false}); p.rotation.x=-.18; }
+for(let i=0;i<=5;i++) box(.12,1.3,.12,0xc9ced6,-28+i*5.2,DECK,40.4);
+// gate complex
+box(12,.04,9,0x8b9097,48,DECK,43.5,{cast:false});
+box(8.6,.32,3.6,0x2443b8,48.1,DECK+2.2,44.4);
+for(const x of [44.2,52]) for(const z of [42.8,46]) box(.22,2.2,.22,0xc9ced6,x,DECK,z);
+for(const x of [45,48.1,51.2]) box(.9,1,1.6,0xf3f4f6,x,DECK,44.4);
+const arms={in:{g:new THREE.Group(),a:0,t:0},out:{g:new THREE.Group(),a:0,t:0}};
+function arm(o,x,z){ o.g.position.set(x,DECK+.7,z); box(2.3,.1,.1,0xd9443a,1.15,0,0,{parent:o.g,cast:false}); scene.add(o.g); }
+arm(arms.in,45.4,43.3); arm(arms.out,48.4,45.7);
+// channel buoys along the approach
+[[-150,-82],[-118,-58],[-86,-40],[-58,-26]].forEach(([x,z],i)=>{ for(const s of [-1,1]){ const b=new THREE.Mesh(new THREE.CylinderGeometry(.5,.7,1.6,8),M(s<0?0xc8372d:0x2e8b57)); b.position.set(x+s*4,.5,z-s*7); b.castShadow=true; scene.add(b);} });
+
+/* ---------- Yard blocks and stacks ---------- */
+const BX=[[-50,-33],[-30,-13],[-10,7],[10,27],[30,47]], BZ=[10,17,24,31];
+const blocks=[];
+BZ.forEach((z0,zi)=>BX.forEach(([x0,x1],xi)=>blocks.push({i:blocks.length,x0,x1,z0,kind:zi<3?'std':(xi===4?'reefer':'empty')})));
+const NB=blocks.length, ROWS=6, BAYS=13, TIERS=5;
+const bayX=(b,k)=>b.x0+.75+k*1.3, rowZ=(b,r)=>b.z0+.45+r*.27;
+const stIM=new THREE.InstancedMesh(boxG,new THREE.MeshStandardMaterial({roughness:.75,metalness:.1}),NB*ROWS*BAYS*TIERS);
+stIM.castShadow=true; stIM.receiveShadow=true; scene.add(stIM); stIM.setColorAt(0,_c.setHex(0xffffff));
+const stH=new Uint8Array(NB*ROWS*BAYS), stCol=new Uint32Array(NB*ROWS*BAYS*TIERS);
+const sIdx=(b,r,k)=>(b.i*ROWS+r)*BAYS+k;
+function setTier(b,r,k,t,c){ const i=sIdx(b,r,k)*TIERS+t; if(c==null){stIM.setMatrixAt(i,ZERO);} else { stCol[i]=c; _o.position.set(bayX(b,k),DECK+CH/2+t*CH,rowZ(b,r)); _o.rotation.set(0,0,0); _o.scale.set(CL,CH*.96,CW*.94); _o.updateMatrix(); stIM.setMatrixAt(i,_o.matrix); stIM.setColorAt(i,_c.setHex(c)); } }
+function colFor(b){ return b.kind==='reefer'?0xeef1f4:(b.kind==='empty'?[0x8f99a6,0xa3a9b3,0x7d8794][Math.floor(rnd()*3)]:pal()); }
+function fillStacks(mean){
+  blocks.forEach(b=>{ for(let r=0;r<ROWS;r++)for(let k=0;k<BAYS;k++){
+    let h = b.kind==='empty' ? 3+Math.floor(rnd()*2) : Math.max(0,Math.min(TIERS-1,Math.round(mean+(rnd()-.5)*2.6)));
+    if(b.kind==='reefer') h=Math.min(h,3);
+    stH[sIdx(b,r,k)]=h; for(let t=0;t<TIERS;t++) setTier(b,r,k,t,t<h?colFor(b):null);
+  }});
+  stIM.instanceMatrix.needsUpdate=true; stIM.instanceColor.needsUpdate=true;
+}
+function pushBox(b,r,k,c){ const s=sIdx(b,r,k); if(stH[s]>=TIERS) return; setTier(b,r,k,stH[s],c); stH[s]++; stIM.instanceMatrix.needsUpdate=true; stIM.instanceColor.needsUpdate=true; }
+function popBox(b,r,k){ const s=sIdx(b,r,k); if(!stH[s]) return colFor(b); stH[s]--; const c=stCol[s*TIERS+stH[s]]; setTier(b,r,k,stH[s],null); stIM.instanceMatrix.needsUpdate=true; return c; }
+function pickSlot(b,needBox){ for(let n=0;n<30;n++){ const r=Math.floor(rnd()*ROWS),k=Math.floor(rnd()*BAYS),h=stH[sIdx(b,r,k)]; if(needBox? h>0 : h<TIERS-1) return {r,k}; } return {r:0,k:Math.floor(rnd()*BAYS)}; }
+// reefer plug racks, empty-depot reach stackers
+const rb=blocks.find(b=>b.kind==='reefer'); for(let k=0;k<=BAYS;k+=2) box(.08,1.2,.08,0x3b4250,rb.x0+.1+k*1.3,DECK,rb.z0+2.05,{cast:false});
+for(const [x,z] of [[-36,34.2],[-14,34.2]]){ box(1.4,.6,.8,0xd2a82c,x,DECK,z); const b=box(.2,.2,2,0x2b3038,x,DECK+1,z-.6); b.rotation.x=.5; }
+
+/* ---------- Ships ---------- */
+function hullGeo(L,B){ const s=new THREE.Shape(); s.moveTo(-L/2,-B/2); s.lineTo(L/2-B*1.3,-B/2); s.quadraticCurveTo(L/2,-B*.25,L/2+.2,0); s.quadraticCurveTo(L/2,B*.25,L/2-B*1.3,B/2); s.lineTo(-L/2,B/2); s.lineTo(-L/2,-B/2);
+  const g=new THREE.ExtrudeGeometry(s,{depth:1,bevelEnabled:false}); g.rotateX(-Math.PI/2); return g; }
+function buildShip({L,B,rows,tiers,x,z,docked,name}){
+  const g=new THREE.Group(); scene.add(g); g.position.set(x,0,z);
+  const hull=new THREE.Mesh(hullGeo(L,B),M(0x23303f)); hull.scale.y=1.9; hull.position.y=-.6; hull.castShadow=true; g.add(hull);
+  const boot=new THREE.Mesh(hullGeo(L*1.002,B*1.01),M(0x9c3328)); boot.scale.y=.78; boot.position.y=-.62; g.add(boot);
+  const dk=new THREE.Mesh(hullGeo(L*.995,B*.97),M(0x4a525c)); dk.scale.y=.02; dk.position.y=1.3; g.add(dk);
+  const bx=-L/2+2.4; box(1.6,2.8,B*.9,0xf2f3f5,bx,1.3,0,{parent:g}); box(1.9,.3,B*1.06,0xe2e5ea,bx,4.1,0,{parent:g}); box(.55,1.6,.55,0x2b2f36,bx-1.3,1.3,0,{parent:g});
+  const data=[]; const nb=Math.floor((L-6.8)/(CL*1.05));
+  for(let b=0;b<nb;b++) for(let r=0;r<rows;r++){
+    const edge=Math.abs(r-(rows-1)/2)>(rows/2-1.4); const h=Math.max(1,tiers-(edge?1:0)-Math.floor(rnd()*1.6));
+    for(let t=0;t<h;t++) data.push({x:-L/2+4.3+b*CL*1.05+CL/2,y:1.33+CH/2+t*CH,z:(r-(rows-1)/2)*CW*1.04,c:pal(),t,alive:true});
+  }
+  const im=new THREE.InstancedMesh(boxG,new THREE.MeshStandardMaterial({roughness:.75,metalness:.1}),data.length);
+  im.castShadow=true; im.receiveShadow=true; g.add(im);
+  const S={g,im,data,L,B,rows,docked,name,
+    restore(){ data.forEach((d,i)=>{d.alive=true;_o.position.set(d.x,d.y,d.z);_o.rotation.set(0,0,0);_o.scale.set(CL,CH*.96,CW*.94);_o.updateMatrix();im.setMatrixAt(i,_o.matrix);im.setColorAt(i,_c.setHex(d.c));}); im.instanceMatrix.needsUpdate=true; im.instanceColor.needsUpdate=true; },
+    take(i){ data[i].alive=false; im.setMatrixAt(i,ZERO); im.instanceMatrix.needsUpdate=true; },
+    pick(xmin,xmax,cx){ let best=-1,bs=1e9; const gx=g.position.x;
+      for(let i=0;i<data.length;i++){ const d=data[i]; if(!d.alive) continue; const wx=gx+d.x; if(wx<xmin||wx>xmax) continue;
+        const s=Math.round(Math.abs(wx-cx)/1.2)*100 - d.t*10 - d.z; if(s<bs){bs=s;best=i;} }
+      if(best<0) return null; const d=data[best]; return {i:best,wx:gx+d.x,wy:d.y,wz:g.position.z+d.z,c:d.c}; }
+  };
+  S.restore(); return S;
+}
+const HX=-6, HB=4.3, HZ=-(HB/2+.45);
+const hero=buildShip({L:30,B:HB,rows:17,tiers:6,x:-200,z:-120,docked:false,name:'hero'});
+const ship2=buildShip({L:24,B:3.3,rows:13,tiers:5,x:27,z:-(3.3/2+.45),docked:true,name:'regional'});
+const ship3=buildShip({L:22,B:3.3,rows:13,tiers:4,x:-40,z:-(3.3/2+.45),docked:true,name:'feeder'});
+// hero wake + tugs + lines
+const wake=new THREE.Mesh(new THREE.PlaneGeometry(18,3.6),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false}));
+wake.rotation.x=-Math.PI/2; wake.position.set(-15-9,.06,0); hero.g.add(wake);
+function buildTug(){ const g=new THREE.Group(); box(2.4,.9,1.05,0xb5473b,0,-.25,0,{parent:g}); box(.95,.8,.75,0xf2f3f5,-.25,.65,0,{parent:g}); box(.2,.6,.2,0x2b2f36,-.6,1.45,0,{parent:g}); scene.add(g);
+  const w=new THREE.Mesh(new THREE.CircleGeometry(1.4,20),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false})); w.rotation.x=-Math.PI/2; w.position.set(-2,.07,0); g.add(w); g.userData.wash=w; return g; }
+const tugA=buildTug(), tugB=buildTug();
+const lineMat=new THREE.LineBasicMaterial({color:0x2b2f36});
+function mkLine(){ const l=new THREE.Line(new THREE.BufferGeometry().setFromPoints([V(0,0,0),V(0,0,0)]),lineMat); l.frustumCulled=false; scene.add(l); return l; }
+function setLine(l,a,b){ const p=l.geometry.attributes.position; p.setXYZ(0,a.x,a.y,a.z); p.setXYZ(1,b.x,b.y,b.z); p.needsUpdate=true; }
+const towA=mkLine(), towB=mkLine(); const moor=[0,1,2,3,4,5].map(mkLine);
+const MOOR_L=[-13.5,-11,-6,6,11,13.6];
+
+/* ---------- Quay cranes ---------- */
+const stays=[];
+class Crane{
+  constructor(x,pp){
+    Object.assign(this,{pp,x,home:x,range:pp?5.2:4.4,H:pp?4.8:4.1,OUT:pp?6.3:5.0,ship:null,queue:[],st:'parked',timer:0,boomA:1.25,boomT:1.25,trolZ:3.6,noWork:false,boxC:0});
+    this.top=DECK+this.H-1.75; this.hoist=this.top;
+    const col=pp?0x2443b8:0x7088b8, H=this.H, g=new THREE.Group(); this.g=g; scene.add(g);
+    for(const lx of [-1.35,1.35]){ for(const lz of [1.2,4.2]){ box(.3,H,.3,col,lx,DECK,lz,{parent:g}); box(.55,.3,.55,0x2b3038,lx,DECK,lz,{parent:g}); } box(.26,.32,3.3,col,lx,DECK+H*.55,2.7,{parent:g}); }
+    box(2.95,.32,.3,col,0,DECK+H-.3,1.2,{parent:g}); box(2.95,.32,.3,col,0,DECK+H-.3,4.2,{parent:g});
+    box(.9,.42,6.4,col,0,DECK+H,4.3,{parent:g}); box(1.9,.95,2.0,0xeef0f3,0,DECK+H+.42,6.4,{parent:g});
+    for(const lx of [-.38,.38]) box(.2,2.7,.2,col,lx,DECK+H+.42,2.4,{parent:g});
+    const piv=new THREE.Group(); piv.position.set(0,DECK+H+.21,1.15); g.add(piv); this.piv=piv;
+    const ol=this.OUT+.75; box(.9,.42,ol,col,0,-.21,-ol/2,{parent:piv});
+    this.trolley=box(1.05,.3,.95,0x2b3038,0,DECK+H-.32,this.trolZ,{parent:g});
+    this.spr=new THREE.Group(); g.add(this.spr); box(1.32,.12,.32,0xd2a82c,0,0,0,{parent:this.spr});
+    this.loadMat=new THREE.MeshStandardMaterial({color:0xb5473b,roughness:.75}); this.load=box(CL,CH,CW,0,0,-CH-.06,0,{parent:this.spr,mat:this.loadMat}); this.load.visible=false;
+    this.cable=rod(.045,0x1d2228); this.stay1=rod(.07,0x3b4250); this.stay2=rod(.07,0x3b4250); this.stay3=rod(.07,0x3b4250);
+    this.beacon=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,1.3,10),new THREE.MeshBasicMaterial({color:pp?0x3fd49a:0xffb93b})); this.beacon.position.set(0,DECK+H+1.5,6.4); this.beacon.visible=false; g.add(this.beacon);
+    this.ring=new THREE.Mesh(new THREE.RingGeometry(2.3,2.8,40),new THREE.MeshBasicMaterial({color:pp?0x16916a:0xd98c12,transparent:true,opacity:.85,side:THREE.DoubleSide,depthWrite:false})); this.ring.rotation.x=-Math.PI/2; this.ring.position.set(0,DECK+.08,2.7); this.ring.visible=false; g.add(this.ring);
+  }
+  accepting(){ return this.ship && this.ship.docked && !this.noWork; }
+  reset(instant){ this.queue.forEach(t=>t.release()); this.queue=[]; this.st='parked'; this.load.visible=false; this.noWork=false; this.boomT=1.25; if(instant){this.boomA=1.25; this.trolZ=3.6; this.hoist=this.top;} }
+  update(dt){
+    const working=this.accepting();
+    this.boomA=approach(this.boomA,this.boomT,.5,dt);
+    switch(this.st){
+      case 'parked': this.boomT=working?0:1.25; this.trolZ=approach(this.trolZ,3.6,2.5,dt); this.hoist=approach(this.hoist,this.top,1.6,dt);
+        if(working&&this.boomA<.003) this.st='pick'; break;
+      case 'pick': { const t=this.ship.pick(this.home-this.range,this.home+this.range,this.x); if(!t){this.noWork=true;this.st='parked';break;} this.tg=t; this.st='gantry'; break; }
+      case 'gantry': this.x=approach(this.x,this.tg.wx,.9,dt); this.trolZ=approach(this.trolZ,3.0,2.5,dt); if(this.x===this.tg.wx) this.st='toSea'; break;
+      case 'toSea': this.trolZ=approach(this.trolZ,this.tg.wz,3.2,dt); if(this.trolZ===this.tg.wz) this.st='down'; break;
+      case 'down': this.hoist=approach(this.hoist,this.tg.wy+CH/2+.06,2.1,dt); if(this.hoist===this.tg.wy+CH/2+.06){this.st='lock';this.timer=.45;} break;
+      case 'lock': this.timer-=dt; if(this.timer<=0){ this.ship.take(this.tg.i); this.boxC=this.tg.c; this.loadMat.color.setHex(this.boxC); this.load.visible=true; this.st='up'; } break;
+      case 'up': this.hoist=approach(this.hoist,this.top,2.1,dt); if(this.hoist===this.top) this.st='toLand'; break;
+      case 'toLand': this.trolZ=approach(this.trolZ,3.0,3.2,dt); if(this.trolZ===3.0) this.st='waitT'; break;
+      case 'waitT': { const tr=this.queue[0]; if(tr&&tr.ready(this)) this.st='downT'; break; }
+      case 'downT': { const y=DECK+.36+CH+.06; this.hoist=approach(this.hoist,y,2.0,dt); if(this.hoist===y){this.st='rel';this.timer=.4;} break; }
+      case 'rel': this.timer-=dt; if(this.timer<=0){ const tr=this.queue.shift(); this.load.visible=false; if(tr){tr.loadBox(this.boxC); tr.toYard();} this.st='upE'; } break;
+      case 'upE': this.hoist=approach(this.hoist,this.top,2.2,dt); if(this.hoist===this.top) this.st='pick'; break;
+    }
+    // visuals
+    this.g.position.x=this.x; this.piv.rotation.x=this.boomA;
+    this.trolley.position.z=this.trolZ; this.spr.position.set(0,this.hoist,this.trolZ);
+    const x=this.x, H=this.H;
+    stretch(this.cable,tmp.set(x,DECK+H-.32,this.trolZ),tmp2.set(x,this.hoist+.06,this.trolZ));
+    const apex=V(x,DECK+H+3.1,2.4), ol=this.OUT+.75, a=this.boomA, py=DECK+H+.21;
+    stretch(this.stay1,apex,V(x,py+Math.sin(a)*ol,1.15-Math.cos(a)*ol));
+    stretch(this.stay2,apex,V(x,py+Math.sin(a)*ol*.5,1.15-Math.cos(a)*ol*.5));
+    stretch(this.stay3,apex,V(x,DECK+H+.42,7.4));
+  }
+}
+const cranes=[new Crane(-12,true),new Crane(0,true),new Crane(22,false),new Crane(32,false),new Crane(-36,false),new Crane(-45,false)];
+cranes[0].ship=cranes[1].ship=hero; cranes[2].ship=cranes[3].ship=ship2; cranes[4].ship=cranes[5].ship=ship3;
+
+/* ---------- Path follower ---------- */
+class Follower{
+  constructor(o){this.o=o;this.q=[];this.v=0;this.wait=0;this.head=0;this.rev=false;this.vmax=1.5;this.acc=1.1;this.done=null;}
+  go(pts,vmax,done,rev){this.q=pts.map(p=>p.isVector3?{p}:p);this.vmax=vmax;this.done=done||null;this.rev=!!rev;this.wait=0;}
+  stop(){this.q=[];this.wait=0;this.done=null;this.v=0;}
+  get active(){return this.q.length>0||this.wait>0;}
+  setHead(h){this.head=h;this.o.rotation.y=-h;}
+  update(dt){
+    if(this.wait>0){this.wait-=dt;if(this.wait>0)return;if(!this.q.length){const d=this.done;this.done=null;d&&d();return;}}
+    if(!this.q.length) return;
+    let dStop=0,prev=this.o.position;for(let k=0;k<this.q.length;k++){dStop+=prev.distanceTo(this.q[k].p);prev=this.q[k].p;if(this.q[k].stop)break;}
+    let vl=Math.sqrt(2*this.acc*dStop); if(this.q.length>1&&!this.q[0].stop) vl=Math.min(vl,Math.sqrt(.36+2*this.acc*this.o.position.distanceTo(this.q[0].p)));
+    this.v=Math.min(this.vmax,this.v+this.acc*dt,Math.max(vl,.06));
+    let step=this.v*dt;
+    if(!this.rev&&this.q.length){const w=this.q[0].p,dx=w.x-this.o.position.x,dz=w.z-this.o.position.z;if(dx*dx+dz*dz>1e-5){this.head=lerpAngle(this.head,Math.atan2(dz,dx),Math.min(1,dt*6));this.o.rotation.y=-this.head;}}
+    while(step>0&&this.q.length){const w=this.q[0],d=this.o.position.distanceTo(w.p);
+      if(d<=step){this.o.position.copy(w.p);step-=d;this.q.shift();w.onReach&&w.onReach();if(w.stop){this.wait=w.stop;this.v=0;return;}}
+      else{tmp.subVectors(w.p,this.o.position).multiplyScalar(step/d);this.o.position.add(tmp);step=0;}}
+    if(!this.q.length&&this.wait<=0){const d=this.done;this.done=null;d&&d();}
+  }
+}
+
+/* ---------- Vehicles ---------- */
+function buildTruck(cabCol){
+  const g=new THREE.Group(); box(.55,.5,.46,cabCol,.62,0,0,{parent:g}); box(1.55,.14,.4,0x2b3038,-.38,.22,0,{parent:g});
+  for(const x of [.6,-.2,-.95]) for(const z of [-.2,.2]) box(.22,.22,.08,0x15181d,x,0,z,{parent:g,cast:false});
+  const mat=new THREE.MeshStandardMaterial({color:0xb5473b,roughness:.75}); const cargo=box(CL*.98,CH,CW,0,-.42,.36,0,{parent:g,mat}); cargo.visible=false;
+  g.position.y=0; scene.add(g); return {g,cargo,mat};
+}
+const tractors=[];
+class Tractor{
+  constructor(i){ Object.assign(this,buildTruck(0xd2a82c)); this.f=new Follower(this.g); this.spot=-27.4+i*1.04; this.g.position.set(this.spot,DECK,38.6); this.f.setHead(Math.PI/2); this.st='parked'; this.loc={k:'park'}; this.cr=null; }
+  loadBox(c){ this.mat.color.setHex(c); this.cargo.visible=true; this.c=c; }
+  unload(){ this.cargo.visible=false; return this.c; }
+  ready(cr){ return this.st==='waiting'&&cr.queue[0]===this&&!this.f.active&&Math.abs(this.g.position.x-cr.x)<.15; }
+  start(){ const p=this.g.position; switch(this.loc.k){
+    case 'park': return [P(this.spot,36.6),P(-11.2,36.6),P(-11.2,7)];
+    case 'block': return [P(this.loc.b.x1+1.6,this.loc.b.z0),P(this.loc.b.x1+1.6,7)];
+    case 'crane': return [P(p.x+2.6,3),P(p.x+3.4,7)];
+    default: return [P(p.x,7)]; } }
+  toCrane(cr){ this.cr=cr; cr.queue.push(this); this.st='toCrane'; const wx=cr.x-2.3*(cr.queue.length-1);
+    this.f.go([...this.start(),P(wx-3.4,7),P(wx-2.6,3),P(wx,3)],1.5,()=>{this.st='waiting';}); }
+  toYard(){ this.loc={k:'crane'}; const cands=blocks.filter(b=>b.kind==='std'&&b.z0<20); const b=cands[Math.floor(rnd()*cands.length)]; const s=pickSlot(b,false);
+    this.st='toYard'; this.cr=null;
+    this.f.go([...this.start(),P(b.x0-1.5,7),P(b.x0-1.5,b.z0),P(bayX(b,s.k),b.z0)],1.5,()=>{ this.st='atRTG'; b.rtg.add({truck:this,kind:'drop',b,r:s.r,k:s.k,free:()=>{this.loc={k:'block',b};this.st='idle';}}); }); }
+  toPark(){ this.st='toPark'; this.f.go([...this.start(),P(-11.2,7),P(-11.2,36.6),P(this.spot,36.6),P(this.spot,38.6)],1.5,()=>{this.st='parked';this.loc={k:'park'};}); }
+  release(){ this.f.stop(); this.cr=null; this.st='idle'; this.loc={k:'free'}; }
+  update(dt){ this.f.update(dt);
+    if(this.st==='waiting'&&!this.f.active&&this.cr){ const idx=this.cr.queue.indexOf(this); const wx=this.cr.x-2.3*idx; const px=this.g.position.x; if(Math.abs(px-wx)>.12) this.f.go([P(wx,3)],.7,null,wx<px); } }
+}
+for(let i=0;i<25;i++) tractors.push(new Tractor(i));
+
+const exts=[]; let extActive=7;
+class ExtTruck{
+  constructor(i){ Object.assign(this,buildTruck([0xf2f3f5,0x2443b8,0xb5473b,0x3d8a5e][i%4])); this.i=i; this.f=new Follower(this.g); this.g.visible=false; this.st='off'; this.timer=1+i*3.1; }
+  spawn(){ const exp=rnd()<.55, reef=exp&&rnd()<.2;
+    const cands=blocks.filter(b=>reef?b.kind==='reefer':(b.kind==='std'&&b.z0>12)); const b=cands[Math.floor(rnd()*cands.length)]; const s=pickSlot(b,!exp);
+    if(exp){ this.mat.color.setHex(reef?0xeef1f4:pal()); this.cargo.visible=true; } else this.cargo.visible=false;
+    this.g.visible=true; this.st='in'; this.g.position.set(46.6,1.05,190); this.f.setHead(-Math.PI/2); this.f.v=0;
+    this.f.go([P(46.6,183,1.05),P(46.6,170,E),P(46.6,70,E),P(46.6,56,DECK),{p:P(46.6,44.6),stop:1.6,onReach:()=>arms.in.t=2.6},P(46.6,39),P(46.6,37.2),P(b.x0-1.8,37.2),P(b.x0-1.8,b.z0),P(bayX(b,s.k),b.z0)],1.6,
+      ()=>{ this.st='atRTG'; b.rtg.add({truck:this,kind:exp?'drop':'pick',b,r:s.r,k:s.k,free:()=>this.out(b)}); }); }
+  loadBox(c){ this.mat.color.setHex(c); this.cargo.visible=true; }
+  unload(){ this.cargo.visible=false; return this.mat.color.getHex(); }
+  out(b){ this.st='out'; this.f.go([P(b.x1+1.8,b.z0),P(b.x1+1.8,36.2),P(49.6,36.2),P(49.6,41),{p:P(49.6,44.6),stop:1.1,onReach:()=>arms.out.t=2.4},P(49.6,56,DECK),P(49.6,70,E),P(49.6,170,E),P(49.6,183,1.05),P(49.6,189,1.05)],1.6,
+      ()=>{ this.g.visible=false; this.st='off'; this.timer=2+rnd()*8; }); }
+  update(dt){ if(this.st==='off'){ if(this.i>=extActive) return; this.timer-=dt; if(this.timer<=0) this.spawn(); return; } this.f.update(dt); }
+}
+for(let i=0;i<16;i++) exts.push(new ExtTruck(i));
+
+/* ---------- RTGs (16 e-RTG) ---------- */
+const rtgs=[];
+class RTG{
+  constructor(b){ this.b=b; b.rtg=this; this.x=b.x0+3+rnd()*11; this.jobs=[]; this.job=null; this.st='idle'; this.trolZ=b.z0+1; this.TR=DECK+1.72; this.hoist=this.TR;
+    const g=new THREE.Group(); this.g=g; scene.add(g); const z0=b.z0;
+    for(const lx of [-.95,.95]){ for(const lz of [z0-.5,z0+2.2]) box(.18,1.98,.18,0xe9ecf0,lx,DECK,lz,{parent:g}); box(.26,.28,2.95,0x2443b8,lx,DECK+1.98,z0+.85,{parent:g}); }
+    for(const lz of [z0-.5,z0+2.2]) box(2.1,.18,.26,0xe9ecf0,0,DECK+.12,lz,{parent:g});
+    this.trolley=box(.9,.22,.55,0xd2a82c,0,DECK+1.98,this.trolZ,{parent:g});
+    this.spr=new THREE.Group(); g.add(this.spr); box(1.3,.1,.3,0x2b3038,0,0,0,{parent:this.spr});
+    this.loadMat=new THREE.MeshStandardMaterial({color:0xb5473b,roughness:.75}); this.load=box(CL,CH,CW,0,0,-CH-.05,0,{parent:this.spr,mat:this.loadMat}); this.load.visible=false;
+    this.cable=rod(.04,0x1d2228);
+  }
+  add(j){ this.jobs.push(j); }
+  update(dt){
+    const b=this.b, laneZ=b.z0, truckY=DECK+.36+CH+.05;
+    if(!this.job){ if(this.jobs.length){ this.job=this.jobs.shift(); this.st='gantry'; } }
+    const j=this.job;
+    if(j){ const rz=rowZ(b,j.r), h=stH[sIdx(b,j.r,j.k)];
+      switch(this.st){
+        case 'gantry': this.x=approach(this.x,bayX(b,j.k),.8,dt); this.hoist=approach(this.hoist,this.TR,1.4,dt); if(this.x===bayX(b,j.k)) this.st= j.kind==='drop'?'toA':'toB'; break;
+        // drop: truck -> stack
+        case 'toA': this.trolZ=approach(this.trolZ,laneZ,1.6,dt); if(this.trolZ===laneZ) this.st='dA'; break;
+        case 'dA': this.hoist=approach(this.hoist,truckY,1.4,dt); if(this.hoist===truckY){this.st='lA';this.timer=.4;} break;
+        case 'lA': this.timer-=dt; if(this.timer<=0){ this.loadMat.color.setHex(j.truck.unload()); this.load.visible=true; this.st='uA'; } break;
+        case 'uA': this.hoist=approach(this.hoist,this.TR,1.4,dt); if(this.hoist===this.TR){ j.free(); this.st='tA'; } break;
+        case 'tA': this.trolZ=approach(this.trolZ,rz,1.6,dt); if(this.trolZ===rz) this.st='d2A'; break;
+        case 'd2A': { const y=DECK+(h+1)*CH+.05; this.hoist=approach(this.hoist,y,1.4,dt); if(this.hoist===y){this.st='rA';this.timer=.35;} break; }
+        case 'rA': this.timer-=dt; if(this.timer<=0){ pushBox(b,j.r,j.k,this.loadMat.color.getHex()); this.load.visible=false; this.st='done'; } break;
+        // pick: stack -> truck
+        case 'toB': this.trolZ=approach(this.trolZ,rz,1.6,dt); if(this.trolZ===rz) this.st='dB'; break;
+        case 'dB': { const y=DECK+Math.max(h,1)*CH+.05; this.hoist=approach(this.hoist,y,1.4,dt); if(this.hoist===y){this.st='lB';this.timer=.4;} break; }
+        case 'lB': this.timer-=dt; if(this.timer<=0){ this.loadMat.color.setHex(popBox(b,j.r,j.k)); this.load.visible=true; this.st='uB'; } break;
+        case 'uB': this.hoist=approach(this.hoist,this.TR,1.4,dt); if(this.hoist===this.TR) this.st='tB'; break;
+        case 'tB': this.trolZ=approach(this.trolZ,laneZ,1.6,dt); if(this.trolZ===laneZ) this.st='d2B'; break;
+        case 'd2B': this.hoist=approach(this.hoist,truckY,1.4,dt); if(this.hoist===truckY){this.st='rB';this.timer=.35;} break;
+        case 'rB': this.timer-=dt; if(this.timer<=0){ j.truck.loadBox(this.loadMat.color.getHex()); this.load.visible=false; j.free(); this.st='done'; } break;
+        case 'done': this.hoist=approach(this.hoist,this.TR,1.4,dt); if(this.hoist===this.TR){ this.job=null; this.st='idle'; } break;
+      }
+    }
+    this.g.position.x=this.x; this.trolley.position.z=this.trolZ; this.spr.position.set(0,this.hoist,this.trolZ);
+    stretch(this.cable,tmp.set(this.x,DECK+1.98,this.trolZ),tmp2.set(this.x,this.hoist+.05,this.trolZ));
+  }
+}
+blocks.filter(b=>b.kind!=='empty').forEach(b=>rtgs.push(new RTG(b)));
+
+/* ---------- Hero ship arrival ---------- */
+const approachC=new THREE.CatmullRomCurve3([V(-210,0,-125),V(-130,0,-72),V(-66,0,-36),V(-34,0,-17),V(HX-13,0,-9.5),V(HX,0,-9)],false,'centripetal');
+const arrive={p:0,rate:1/45,docked:false};
+const TUG_T=[[15+4.6,0,0],[-15-3.6,0,-1.6]], TUG_P=[[15-7,0,-(HB/2+1.25)],[-15+7,0,-(HB/2+1.25)]];
+function heroPose(p){
+  let pos,head,spd=0;
+  if(p<.6){ const u=p/.6, s=1-Math.pow(1-u,1.7); pos=approachC.getPointAt(s); const tg=approachC.getTangentAt(s); head=Math.atan2(tg.z,tg.x); spd=Math.pow(1-u,.7); }
+  else if(p<.88){ const u=(p-.6)/.28; pos=V(HX,0,lerp(-9,HZ,ease(u))); head=0; }
+  else { pos=V(HX,0,HZ); head=0; }
+  return {pos,head,spd};
+}
+function placeHero(){
+  const p=Math.min(arrive.p,1), {pos,head,spd}=heroPose(p);
+  hero.g.position.copy(pos); hero.g.rotation.y=-head; hero.g.updateMatrixWorld(); wake.material.opacity=.32*spd;
+  const tb=Math.min(1,Math.max(0,(p-.48)/.12)), push=p>.6&&p<.9?1:0, away=Math.max(0,(p-.9)/.1);
+  [tugA,tugB].forEach((tg,i)=>{
+    const a=TUG_T[i], b=TUG_P[i]; const lx=lerp(a[0],b[0],tb), lz=lerp(a[2],b[2],tb)-away*6;
+    hero.g.localToWorld(tmp.set(lx,0,lz)); tg.position.set(tmp.x,.25,tmp.z);
+    tg.rotation.y=-(head+lerp(0,Math.PI/2,tb));
+    tg.updateMatrixWorld();
+    tg.userData.wash.material.opacity=push*(.35+.15*Math.sin(perf*9+i));
+  });
+  towA.visible=towB.visible=p<.55;
+  if(towA.visible){ setLine(towA,tugA.localToWorld(tmp.set(-1.2,.4,0)).clone(),hero.g.localToWorld(tmp2.set(15,1.4,0)).clone()); setLine(towB,tugB.localToWorld(tmp.set(1.2,.4,0)).clone(),hero.g.localToWorld(tmp2.set(-15,1.4,0)).clone()); }
+  moor.forEach((l,i)=>{ l.visible=p>.9+i*.016; if(l.visible){ hero.g.localToWorld(tmp.set(MOOR_L[i],1.35,HB/2-.15)); setLine(l,tmp.clone(),V(HX+MOOR_L[i]*1.15,DECK+.15,.45)); } });
+  if(p>=1&&!hero.docked){ hero.docked=true; }
+}
+function resetHero(p0,rate){ hero.docked=false; hero.restore(); arrive.p=p0; arrive.rate=rate; cranes[0].reset(true); cranes[1].reset(true); placeHero(); }
+
+/* ---------- Simulation step ---------- */
+let perf=0;
+function dispatch(){
+  for(const t of tractors){ if(t.st!=='idle'&&t.st!=='parked') continue;
+    let best=null; for(const c of cranes) if(c.accepting()&&c.queue.length<4&&(!best||c.queue.length<best.queue.length)) best=c;
+    if(best) t.toCrane(best); else if(t.st==='idle') t.toPark(); }
+}
+function sim(dt){
+  perf+=dt;
+  if(arrive.p<1){ arrive.p=Math.min(1,arrive.p+dt*arrive.rate); }
+  placeHero();
+  cranes.forEach(c=>c.update(dt)); dispatch();
+  tractors.forEach(t=>t.update(dt)); exts.forEach(t=>t.update(dt)); rtgs.forEach(r=>r.update(dt));
+  for(const k in arms){ const o=arms[k]; o.t-=dt; o.a=approach(o.a,o.t>0?1.35:0,2.2,dt); o.g.rotation.z=o.a; }
+}
+
+/* ---------- Digital Twin layer ---------- */
+const twin=new THREE.Group(); twin.visible=false; scene.add(twin);
+const NSEG=6, SEGW=(QX1-QX0)/NSEG;
+const util={asis:[.38,.22,.10,.14,.06,.04],tobe:[.82,.74,.55,.62,.45,.35]};
+const segs=[];
+const cLo=new THREE.Color(0xdfe8f7),cMid=new THREE.Color(0x7d9de6),cHi=new THREE.Color(0x1d3596);
+const ramp=u=>u<.5?new THREE.Color().copy(cLo).lerp(cMid,u*2):new THREE.Color().copy(cMid).lerp(cHi,(u-.5)*2);
+for(let i=0;i<NSEG;i++){ const m=new THREE.Mesh(new THREE.PlaneGeometry(SEGW-.6,6),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.7,depthWrite:false}));
+  m.rotation.x=-Math.PI/2; m.position.set(QX0+SEGW*(i+.5),DECK+.07,3.1); twin.add(m);
+  const bar=new THREE.Mesh(boxG,new THREE.MeshBasicMaterial({color:0x1d3596,transparent:true,opacity:.9})); twin.add(bar); segs.push({m,bar}); }
+const pulseG=new THREE.SphereGeometry(.42,10,8), pulseM=new THREE.MeshBasicMaterial({color:0x4f7bf0});
+const flow1=new THREE.CatmullRomCurve3([V(62,2.5,198),V(48,E+.7,180),V(48,E+.7,70),V(48,DECK+1.2,50),V(30,DECK+3,42),V(-35,DECK+8.6,42.5)]);
+const flow2=new THREE.CatmullRomCurve3([V(-35,DECK+8.6,42.5),V(-30,DECK+7,24),V(-6,DECK+6,4),V(-6,DECK+4,-1.5)]);
+const pulses=[]; for(let i=0;i<34;i++){ const p=new THREE.Mesh(pulseG,pulseM); twin.add(p); pulses.push({p,c:i<24?flow1:flow2,t:i/(i<24?24:10)}); }
+twin.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(flow1.getPoints(120).concat(flow2.getPoints(40))),new THREE.LineBasicMaterial({color:0x4f7bf0,transparent:true,opacity:.5})));
+const halo=new THREE.Mesh(new THREE.TorusGeometry(2.8,.12,8,48),new THREE.MeshBasicMaterial({color:0x4f7bf0})); halo.rotation.x=Math.PI/2; halo.position.set(-35,DECK+9.6,42.5); twin.add(halo);
+
+/* ---------- Hologram layer ---------- */
+const HOLO=0x47e6ff, HOLO_BG=0x020b16, ADD=THREE.AdditiveBlending;
+const holoFill=new THREE.MeshBasicMaterial({color:HOLO,transparent:true,opacity:.06,blending:ADD,depthWrite:false});
+const holoBox=new THREE.MeshBasicMaterial({color:HOLO,transparent:true,opacity:.11,blending:ADD,depthWrite:false});
+const holoBoxPlain=holoBox.clone();
+const holoEdge=new THREE.LineBasicMaterial({color:HOLO,transparent:true,opacity:.7,blending:ADD,depthWrite:false});
+const holoSea=new THREE.MeshBasicMaterial({color:0x03121f});
+const edgeCache=new Map(); const edgesOf=g=>{ if(!edgeCache.has(g.uuid)) edgeCache.set(g.uuid,new THREE.EdgesGeometry(g,25)); return edgeCache.get(g.uuid); };
+const holoSwap=[]; const skip=new Set([twin,extZone]);
+(function collect(o){ if(skip.has(o)) return;
+  if(o.isMesh&&!o.userData.noHolo){ const basic=o.material&&o.material.isMeshBasicMaterial;
+    if(o===sea) holoSwap.push({m:o,orig:o.material,holo:holoSea});
+    else if(o.isInstancedMesh) holoSwap.push({m:o,orig:o.material,holo:o.instanceColor?holoBox:holoBoxPlain});
+    else if(!basic){ const e=new THREE.LineSegments(edgesOf(o.geometry),holoEdge); e.visible=false; e.userData.noHolo=true; o.add(e); holoSwap.push({m:o,orig:o.material,holo:holoFill,edge:e}); } }
+  o.children.slice().forEach(collect); })(scene);
+const holoExtras=new THREE.Group(); holoExtras.visible=false; scene.add(holoExtras);
+const grid=new THREE.GridHelper(1400,140,HOLO,HOLO); Object.assign(grid.material,{transparent:true,opacity:.13,blending:ADD,depthWrite:false}); grid.position.y=.25; holoExtras.add(grid);
+const sweep=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:HOLO,transparent:true,opacity:.14,blending:ADD,depthWrite:false,side:THREE.DoubleSide}));
+sweep.rotation.y=Math.PI/2; sweep.scale.set(48,14,1); sweep.position.set(-60,7,23); holoExtras.add(sweep);
+const sweepLine=new THREE.Mesh(boxG,new THREE.MeshBasicMaterial({color:HOLO,transparent:true,opacity:.9,blending:ADD,depthWrite:false})); sweepLine.scale.set(.25,.1,48); sweepLine.position.set(-60,DECK+.1,23); holoExtras.add(sweepLine);
+const pad=new THREE.Mesh(new THREE.RingGeometry(80,81.2,96),new THREE.MeshBasicMaterial({color:HOLO,transparent:true,opacity:.45,blending:ADD,depthWrite:false,side:THREE.DoubleSide}));
+pad.rotation.x=-Math.PI/2; pad.position.set(0,.4,20); holoExtras.add(pad); const pad2=pad.clone(); pad2.scale.setScalar(.8); holoExtras.add(pad2);
+let holoOn=false;
+function setHolo(on){ holoOn=on; document.body.classList.toggle('holo',on); document.getElementById('btnHolo').setAttribute('aria-pressed',on);
+  holoSwap.forEach(x=>{x.m.material=on?x.holo:x.orig; if(x.edge) x.edge.visible=on;});
+  scene.background.setHex(on?HOLO_BG:SKY); scene.fog.color.setHex(on?HOLO_BG:SKY); scene.fog.near=on?220:320;
+  holoExtras.visible=on; sun.castShadow=!on; shallow.visible=!on; wake.visible=!on; [tugA,tugB].forEach(t=>t.userData.wash.visible=!on); }
+
+/* ---------- Labels ---------- */
+const labelsEl=document.getElementById('labels'); const labels=[];
+function label(key,text,pos,cls='',layer='base'){ const d=document.createElement('div'); d.className='lbl '+cls; d.innerHTML='<i></i><span></span>'; d.lastChild.textContent=text; labelsEl.appendChild(d); const L={key,d,pos:pos.isVector3?pos:V(...pos),layer}; labels.push(L); return L; }
+label('quay','Dermaga terbangun 1.062 m · LWS −16 m',[22,DECK+1,-1.2],'big');
+label('ext','Tahap lanjutan · desain total dermaga 1.600 m',[-81,1,23]);
+label('pp','QCC Post-Panamax · 17 baris',[-6,DECK+8.6,3.5]);
+label('std','QCC standar · maks. 13 baris',[27,DECK+7.8,3.5]);
+label('yard','Lapangan penumpukan · 16 e-RTG',[-2,DECK+3.1,20]);
+label('reefer','Blok reefer · 392 plug',[38.5,DECK+2.8,32]);
+label('gate','Gate · Truck Booking System',[48,DECK+3.4,44.4]);
+label('ctrl','Ruang kendali terpadu',[-35,DECK+9.6,42.5]);
+label('park','Armada 25 terminal tractor',[-15,DECK+2.4,39.2]);
+label('toll','Jalan Tol Akses MNP · 3,2 km',[48,E+1.2,104]);
+label('icd','ICD/CFS hulu',[62,5.2,198]);
+label('city','Kota Makassar',[-110,7,210]);
+label('tpm','Terminal Petikemas Makassar · 55% trafik',[-262,4,SHORE-6]);
+label('bw','Breakwater',[62,2.4,-26]);
+const shipL=label('ship','Kapal mainline ±9.000 TEU · 17 baris',V(),'');
+const tugL=label('tug','Kapal tunda',V(),'');
+const segL=segs.map((s,i)=>label('twin','B'+(i+1),[QX0+SEGW*(i+.5),DECK+.6,7.8],'twin','twin'));
+label('twin','Kompatibel 16–17 baris',[-6,DECK+8,-7],'twin ok','twin');
+label('twin','Maks. 13 baris',[27,DECK+7,-6],'twin warn','twin');
+label('twin','Sinkronisasi ICD → TOS',[48,E+3,130],'twin','twin');
+
+/* ---------- UI state ---------- */
+let scen='asis', twinOn=false, labelsOn=true, rec=false, blend=0, tour=null;
+const pct=v=>v.toFixed(1).replace('.',',')+'%';
+function applyScen(){ fillStacks(scen==='asis'?1.1:3.0); ship3.g.visible=scen!=='asis'; ship3.docked=scen!=='asis';
+  if(scen==='asis'){ cranes[4].reset(false); cranes[5].reset(false); }
+  extActive=scen==='asis'?7:16; document.getElementById('kTruck').textContent=extActive;
+  document.getElementById('scAsis').setAttribute('aria-pressed',scen==='asis'); document.getElementById('scTobe').setAttribute('aria-pressed',scen!=='asis'); }
+function paintTwin(){
+  segs.forEach((s,i)=>{ const u=lerp(util.asis[i],util.tobe[i],blend); s.m.material.color.copy(ramp(u)); s.bar.scale.set((SEGW-.6)*u,.15,.45); s.bar.position.set(QX0+SEGW*i+.3+(SEGW-.6)*u/2,DECK,-.55); segL[i].d.lastChild.textContent='B'+(i+1)+' · '+Math.round(u*100)+'%'; });
+  document.getElementById('kUtil').textContent=pct(lerp(15.7,58.8,blend));
+  document.getElementById('twScen').textContent=blend>.5?'Skenario 85%':'As-Is';
+  const al=document.getElementById('alert');
+  if(blend<=.5){al.className='alert';al.textContent='Kapasitas dermaga masih longgar. Investasi crane baru belum diperlukan.';}
+  else {al.className='alert warn';al.textContent='Posisi B1 dan B2 mendekati ambang. Simulasi memantau risiko SLA kapal 16–17 baris sebelum pengadaan QCC.';}
+}
+function setTwin(on){ twinOn=on; twin.visible=on; document.getElementById('twin').hidden=!on; document.getElementById('btnTwin').setAttribute('aria-pressed',on); cranes.forEach(c=>{c.beacon.visible=on;c.ring.visible=on;}); }
+function setRec(on){ rec=on; document.body.classList.toggle('rec',on); document.getElementById('btnRec').setAttribute('aria-pressed',on); }
+document.getElementById('scAsis').onclick=()=>{scen='asis';applyScen();};
+document.getElementById('scTobe').onclick=()=>{scen='tobe';applyScen();};
+document.getElementById('btnTwin').onclick=()=>setTwin(!twinOn);
+document.getElementById('btnHolo').onclick=()=>setHolo(!holoOn);
+document.getElementById('btnLbl').onclick=e=>{labelsOn=!labelsOn;e.currentTarget.setAttribute('aria-pressed',labelsOn);};
+document.getElementById('btnRec').onclick=()=>setRec(!rec);
+document.getElementById('show').onclick=()=>setRec(false);
+document.getElementById('btnArrive').onclick=()=>resetHero(0,1/45);
+document.getElementById('btnShort').onclick=()=>toggleTour('short');
+document.getElementById('btnLong').onclick=()=>toggleTour('long');
+addEventListener('keydown',e=>{ const k=e.key.toLowerCase(); if(k==='h')setRec(!rec); if(k==='d')setTwin(!twinOn); if(k==='g')setHolo(!holoOn); if(k==='t')toggleTour('short'); if(k==='l')toggleTour('long'); if(k==='r')resetHero(0,1/45); });
+
+/* ---------- Tours ---------- */
+const HOLD=(p,t)=>({p0:p,p1:p,t0:t,t1:t});
+const TOURS={
+  short:{arrive:[.35,.65/10],shots:[
+    {d:5,holo:1,cap:'Makassar New Port, gerbang peti kemas Kawasan Timur Indonesia',p0:V(-105,46,-112),p1:V(-112,70,-106),t0:V(-8,0,12),t1:V(-8,0,14),labels:[]},
+    {d:5,follow:1,cap:'Kapal dipandu dua kapal tunda lalu sandar di dermaga',p0:V(-17,10,-21),p1:V(-11,8,-19),t0:V(0,1,0),t1:V(0,1,2),labels:['tug','ship']},
+    {d:5,cap:'QCC membongkar kontainer dari kapal ke terminal tractor',p0:V(12,15,-24),p1:V(36,16,-23),t0:V(27,2.6,2),t1:V(27,2.6,3),labels:['std']},
+    {d:5,cap:'RTG menumpuk kontainer di yard, truk eksternal keluar masuk gate',p0:V(8,18,-4),p1:V(24,19,2),t0:V(20,0,20),t1:V(38,0,32),labels:['yard','gate']},
+    {d:5,twin:1,heat:1,cap:'Digital Twin memetakan utilisasi dermaga dari 15,7% menuju 58,8%',p0:V(-58,92,-82),p1:V(-64,96,-76),t0:V(0,0,20),t1:V(0,0,20),labels:[]}]},
+  long:{arrive:[0,1/22],shots:[
+    {d:7.5,holo:1,cap:'Makassar New Port, gerbang peti kemas Kawasan Timur Indonesia',p0:V(-105,46,-112),p1:V(-116,74,-104),t0:V(-8,0,12),t1:V(-8,0,14),labels:[]},
+    {d:7.5,follow:1,cap:'Kapal kontainer memasuki alur dan dipandu dua kapal tunda',p0:V(-26,13,-28),p1:V(-18,10,-26),t0:V(0,1,0),t1:V(4,1,0),labels:['ship','tug']},
+    {d:7.5,follow:1,cap:'Kapal melambat lalu sandar dan tali tambat dipasang',p0:V(-13,7,-17),p1:V(-5,6,-15),t0:V(0,1,1),t1:V(0,1,2),labels:['tug']},
+    {d:7.5,cap:'Dua QCC Post-Panamax melayani kapal mainline 17 baris',p0:V(-24,11,-13),p1:V(9,12,-14),t0:V(-6,4.5,1.5),t1:V(-6,4.5,1.5),labels:['pp']},
+    {d:7.5,cap:'QCC membongkar kontainer langsung ke terminal tractor',p0:V(-17,7,13),p1:V(-9,6.5,11),t0:V(-9,3,0),t1:V(-6,3,0),labels:[]},
+    {d:7.5,cap:'Terminal tractor membawa kontainer dan RTG menumpuknya di yard',p0:V(-16,11,3),p1:V(-6,12,5),t0:V(-4,1,13),t1:V(4,1,15),labels:['yard']},
+    {d:7.5,cap:'Kargo KTI dari ICD/CFS masuk melalui gate dengan Truck Booking System',p0:V(62,14,120),p1:V(60,13,82),t0:V(48,2,90),t1:V(47,2,48),labels:['icd','toll','gate']},
+    {d:7.5,twin:1,heat:1,cap:'Digital Twin memetakan utilisasi dermaga dari 15,7% menuju 58,8%',p0:V(-58,92,-82),p1:V(-66,96,-74),t0:V(0,0,20),t1:V(0,0,20),labels:[]}]}
+};
+const capEl=document.getElementById('caption'),capT=document.getElementById('capT'),capK=document.getElementById('capK'),barEl=document.querySelector('#bar div'),fadeEl=document.getElementById('fade');
+let saved=null;
+function startTour(name){ const T=TOURS[name]; tour={name,T,t:0,idx:-1,total:T.shots.reduce((a,s)=>a+s.d,0)}; resetHero(T.arrive[0],T.arrive[1]); }
+function toggleTour(name){
+  if(tour&&tour.name===name){ stopTour(); return; }
+  if(!tour) saved={twin:twinOn,holo:holoOn,scen};
+  if(scen!=='asis'){scen='asis';applyScen();}
+  startTour(name); controls.enabled=false;
+  ['short','long'].forEach(n=>{ const b=document.getElementById(n==='short'?'btnShort':'btnLong'); const on=n===name; b.setAttribute('aria-pressed',on); b.textContent=on?'■ Hentikan tur':(n==='short'?'▶ Tur singkat 25 detik':'▶ Tur lengkap 60 detik'); });
+}
+function stopTour(){ tour=null; capEl.style.opacity=0; fadeEl.style.opacity=0; controls.enabled=true; if(saved){setTwin(saved.twin);setHolo(saved.holo);} blend=scen==='asis'?0:1;
+  ['btnShort','btnLong'].forEach((id,i)=>{const b=document.getElementById(id);b.setAttribute('aria-pressed',false);b.textContent=i?'▶ Tur lengkap 60 detik':'▶ Tur singkat 25 detik';}); }
+function tourStep(dt){
+  tour.t+=dt; if(tour.t>=tour.total){ startTour(tour.name); }
+  let acc=0,i=0; for(;i<tour.T.shots.length;i++){ if(tour.t<acc+tour.T.shots[i].d) break; acc+=tour.T.shots[i].d; }
+  i=Math.min(i,tour.T.shots.length-1); const s=tour.T.shots[i], lt=tour.t-acc, u=Math.min(1,lt/s.d), e=ease(u);
+  if(i!==tour.idx){ tour.idx=i; capT.textContent=s.cap; capK.innerHTML=String(i+1).padStart(2,'0')+' / '+String(tour.T.shots.length).padStart(2,'0')+' <em>· waktu simulasi dipercepat</em>'; capEl.style.opacity=1; setTwin(!!s.twin); setHolo(!!s.holo); }
+  const base=s.follow?hero.g.position:V(0,0,0);
+  camera.position.lerpVectors(s.p0,s.p1,e).add(base); controls.target.lerpVectors(s.t0,s.t1,e).add(base); camera.lookAt(controls.target);
+  blend=s.heat?ease(Math.min(1,Math.max(0,(u-.15)/.6))):0;
+  const edge=Math.min(lt,s.d-lt); fadeEl.style.opacity=Math.max(0,1-edge/.4).toFixed(3);
+  barEl.style.width=Math.min(100,tour.t/tour.total*100)+'%';
+}
+
+/* ---------- Boot ---------- */
+applyScen();
+arrive.p=1; hero.g.visible=false; for(let i=0;i<900;i++) sim(.1); hero.g.visible=true; // warm up yard traffic
+resetHero(0,1/45);
+try{ if(new URLSearchParams(location.search).get('holo')==='1') setHolo(true); }catch(e){}
+const clock=new THREE.Clock(); const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function frame(){
+  const dt=Math.min(clock.getDelta(),.05), t=clock.elapsedTime;
+  if(tour) tourStep(dt); else { controls.update(); blend=approach(blend,scen==='asis'?0:1,1.2,dt); }
+  sim(dt*(reduce?.5:1));
+  if(twin.visible){ paintTwin(); pulses.forEach(p=>{p.t=(p.t+dt*.06)%1; p.c.getPointAt(p.t,tmp); p.p.position.copy(tmp);}); halo.scale.setScalar(1+.15*Math.sin(t*3)); }
+  if(holoOn){ const sx=-55+((t*18)%110); sweep.position.x=sx; sweepLine.position.x=sx; holoFill.opacity=.06+.012*Math.sin(t*11); holoEdge.opacity=.62+.08*Math.sin(t*7.3); pad.rotation.z=t*.05; pad2.rotation.z=-t*.08; }
+  renderer.render(scene,camera);
+  shipL.pos.copy(hero.g.position).add(tmp.set(0,5.5,0)); tugL.pos.copy(tugA.position).add(tmp.set(0,2.2,0));
+  const w=innerWidth,h=innerHeight, allow=tour?tour.T.shots[tour.idx].labels:null;
+  labels.forEach(L=>{
+    let show=labelsOn&&(L.layer==='twin'?twinOn:(allow?allow.includes(L.key):true));
+    if(L.key==='ship'||L.key==='tug') show=show&&(allow? true : arrive.p<1);
+    if(show&&L.layer==='base'&&twinOn&&(L.key==='pp'||L.key==='std')) show=false;
+    if(!show){L.d.style.opacity=0;return;}
+    tmp.copy(L.pos).project(camera); const dist=camera.position.distanceTo(L.pos);
+    if(tmp.z>1||Math.abs(tmp.x)>1.1||Math.abs(tmp.y)>1.1||dist>(L.layer==='twin'?300:620)){L.d.style.opacity=0;return;}
+    L.d.style.opacity=1; L.d.style.transform=`translate(${(tmp.x*.5+.5)*w}px,${(-tmp.y*.5+.5)*h-8}px) translate(-50%,-100%)`;
+  });
+  requestAnimationFrame(frame);
+}
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+frame();
+})();
+</script>
+
+</body></html>
