@@ -280,6 +280,45 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 
+
+/* ===== Digital Twin ===== */
+.tw-thesis{align-items:center}
+.tw-eyebrow{font-size:14px;font-weight:600;color:var(--blue)}
+.tw-claim{margin:6px 0 0;font-family:var(--f-display);font-size:32px;font-weight:600;letter-spacing:-.022em;line-height:1.12;text-wrap:balance}
+.thesis .tw-lead{margin:8px 0 0;color:var(--muted);font-size:15px;line-height:1.47;letter-spacing:-.016em;font-weight:400;max-width:62ch}
+.thesis .tw-claim{margin:6px 0 0}
+.tw-side{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+@media (max-width:640px){.tw-side{align-items:flex-start}.tw-claim{font-size:26px}}
+.tw-link{appearance:none;border:0;background:none;color:var(--blue);font:400 15px var(--f-body);cursor:pointer;padding:0}
+.tw-link:hover{text-decoration:underline}
+.tw-card h2{margin-top:6px}
+.tw-k{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--blue);text-transform:none}
+.tw-num{width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:12px}
+.tw-sel{appearance:none;-webkit-appearance:none;border:1px solid var(--hair);background:var(--canvas);border-radius:999px;padding:6px 30px 6px 14px;font:400 14px var(--f-body);color:var(--ink);background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px;background-repeat:no-repeat;max-width:100%}
+.tw-co2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.tw-co2{grid-template-columns:1fr}}
+.co2c{border-radius:var(--r-inner);padding:14px 16px;background:var(--parchment);display:flex;flex-direction:column;gap:2px;min-width:0}
+.co2c.hi{background:var(--blue-soft);border:1px solid rgba(0,102,204,.25)}
+.co2c span{font-size:12px;color:var(--muted)}
+.co2c b{font-family:var(--f-display);font-size:28px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15}
+.co2c b small{font-size:14px;font-weight:400;color:var(--muted);margin-left:3px}
+.co2c em{font-style:normal;font-size:12px;font-weight:600;color:var(--blue)}
+.co2c.save b{color:var(--good)}
+.tw-foot{margin:12px 0 0;font-size:12px;color:var(--muted);line-height:1.45}
+.gantt{display:grid;gap:6px;font-size:12px}
+.g-axis,.g-row{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;align-items:center}
+.g-axis .g-ticks{position:relative;height:16px;color:var(--muted);font-variant-numeric:tabular-nums}
+.g-axis .g-ticks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.g-axis .g-ticks span:first-child{transform:none}.g-axis .g-ticks span:last-child{transform:translateX(-100%)}
+.gantt{min-width:0;overflow:hidden}
+.g-lab{color:var(--ink-80);font-size:12.5px;line-height:1.25;min-width:0}
+.g-lab small{display:block;color:var(--muted);font-size:11px}
+.g-track{position:relative;height:24px;background:var(--parchment);border-radius:6px;overflow:hidden}
+.g-bar{position:absolute;top:3px;bottom:3px;border-radius:5px;background:var(--blue);color:#fff;font-size:10.5px;font-weight:600;display:flex;align-items:center;padding:0 6px;white-space:nowrap;overflow:hidden}
+.g-bar.gray{background:#86868b}.g-bar.ink{background:#3a3a3c}.g-bar.bad{background:var(--bad)}.g-bar.good{background:var(--good)}
+.g-cut{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed var(--bad);z-index:2}
+.g-cutlab{position:absolute;top:-1px;transform:translateX(4px);font-size:10.5px;font-weight:600;color:var(--bad);white-space:nowrap}
+@media (max-width:520px){.g-axis,.g-row{grid-template-columns:84px minmax(0,1fr)}}
 /* ===== Live tracker ===== */
 .trk-badges{display:flex;flex-wrap:wrap;gap:8px}
 .src-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--blue);background:var(--blue-soft);border-radius:999px;padding:6px 12px;white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -396,6 +435,7 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
       <button class="tab" role="tab" data-v="partner" id="t-partner">Partner</button>
       <button class="tab" role="tab" data-v="armada" id="t-armada">Tracker Armada</button>
       <button class="tab" role="tab" data-v="proyeksi" id="t-proyeksi">Proyeksi &amp; Direct Call</button>
+      <button class="tab" role="tab" data-v="twin" id="t-twin">Digital Twin</button>
       <button class="tab" role="tab" data-v="model3d" id="t-model3d">Model 3D</button>
       <span id="soonTabs" class="soon-tabs"></span>
     </nav>
@@ -582,6 +622,63 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
       <div class="chart-box"><canvas id="chBE" aria-label="Grafik titik impas direct call"></canvas></div>
     </div>
   </section>
+  <!-- DIGITAL TWIN -->
+  <section class="view wrap" data-view="twin" hidden>
+    <div class="panel thesis tw-thesis">
+      <div>
+        <span class="tw-eyebrow">Digital Twin terminal</span>
+        <p class="tw-claim">Data yang memutuskan kapan crane ditambah.</p>
+        <p class="tw-lead">Kembaran digital dermaga, crane, yard, gate, dan ICD MNP. Empat fungsi di bawah membaca data operasi yang sama.</p>
+      </div>
+      <div class="tw-side">
+        <div class="seg" id="twScen" role="group" aria-label="Skenario Digital Twin"><button data-s="asis" aria-pressed="true">As-Is</button><button data-s="tobe" aria-pressed="false">Skenario 85%</button></div>
+        <button class="tw-link" id="twTo3d">Lihat di model 3D ›</button>
+      </div>
+    </div>
+
+    <div class="panel c6 tw-card">
+      <div class="tw-k"><span class="tw-num">1</span>Early warning</div>
+      <h2>Bottleneck terlihat sebelum mengganggu operasi</h2>
+      <p class="sub">Okupansi per posisi sandar (6 × 177 m dari dermaga 1.062 m) dibandingkan ambang 70%.</p>
+      <div class="chart-box" style="height:220px"><canvas id="chBerth" aria-label="Okupansi per posisi sandar"></canvas></div>
+      <ul class="alerts" id="twWarn" style="margin-top:16px"></ul>
+    </div>
+
+    <div class="panel c6 tw-card">
+      <div class="tw-k"><span class="tw-num">2</span>Asset planning</div>
+      <h2>Slot dermaga, crane, truk, dan ICD selaras</h2>
+      <p class="sub">Jendela direct call berikutnya. Bentrokan jadwal ditandai merah.</p>
+      <div class="gantt" id="twGantt"></div>
+      <ul class="alerts" id="twPlan" style="margin-top:16px"></ul>
+    </div>
+
+    <div class="panel c6 tw-card">
+      <div class="tw-k"><span class="tw-num">3</span>Investment check</div>
+      <h2>Kapan crane tambahan benar-benar dibutuhkan</h2>
+      <p class="sub">Utilisasi QCC terhadap throughput tahunan untuk 6, 7, dan 8 crane. Investasi layak saat utilisasi melewati 70%.</p>
+      <div class="sliders">
+        <div class="sl"><label for="twT">Throughput terminal <output id="oTwT"></output></label><input type="range" id="twT" min="100000" max="1200000" step="5000" value="155000"><div class="hint">Nilai awal setara utilisasi 15,7% hasil simulasi Simio tim</div></div>
+        <div class="sl"><label for="twG">Pertumbuhan throughput <output id="oTwG"></output></label><input type="range" id="twG" min="2" max="25" step="1" value="12"><div class="hint">Termasuk tambahan volume dari konsolidasi KTI dan direct call</div></div>
+      </div>
+      <div class="chart-box" style="height:230px;margin-top:16px"><canvas id="chInv" aria-label="Utilisasi crane terhadap throughput"></canvas></div>
+      <div class="verdict" id="twInv" style="margin-top:14px"></div>
+    </div>
+
+    <div class="panel c6 tw-card">
+      <div class="tw-k"><span class="tw-num">4</span>Green proof</div>
+      <h2>CO₂e per TEU untuk carrier</h2>
+      <p class="sub">Dihitung per rantai pengiriman dengan kerangka ISO 14083 dan GLEC: jarak × faktor emisi per moda, ditambah emisi penanganan di terminal.</p>
+      <div class="controls" style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <label for="twHub" class="muted" style="font-size:14px">Asal</label><select id="twHub" class="tw-sel"></select>
+        <label for="twDest" class="muted" style="font-size:14px">Tujuan</label><select id="twDest" class="tw-sel"><option value="sha">Shanghai</option><option value="pus">Busan</option><option value="sin">Singapura</option></select>
+      </div>
+      <div class="tw-co2" id="twCo2"></div>
+      <div class="tbl-wrap" style="margin-top:14px"><table id="twCo2Tbl"></table></div>
+      <p class="tw-foot">Faktor emisi ilustratif: feeder 70, kapal induk 20, truk 450 g CO₂e/TEU-km, penanganan terminal 15 kg CO₂e/TEU per move. Ganti dengan faktor default GLEC dan data aktual carrier sebelum dipakai sebagai klaim.</p>
+    </div>
+  </section>
+
+  <!-- MODEL 3D -->
   <section class="view wrap" data-view="model3d" hidden>
     <div class="m3d-head">
       <div>
@@ -853,6 +950,106 @@ function renderFleet(){
 }
 
 
+
+/* ================= DIGITAL TWIN ================= */
+// Selaras dengan model 3D: okupansi per posisi sandar dan QCC kompatibel 2 dari 6.
+const TW_UTIL={asis:[.38,.22,.10,.14,.06,.04],tobe:[.82,.74,.55,.62,.45,.35]};
+const TW_OPS={asis:{yard:.46,gateQ:7,gateCap:16,qccRows:17},tobe:{yard:.81,gateQ:15,gateCap:16,qccRows:17}};
+const QCC_TEU_YR=164250; // 25 move/jam × 1,5 TEU/move × 8.760 jam × 50% efektif (ilustratif)
+const CO2F={feeder:70,mother:20,truck:450,handle:15};
+const DEST={sha:{n:"Shanghai",direct:4600,viaSub:5000},pus:{n:"Busan",direct:5000,viaSub:5400},sin:{n:"Singapura",direct:2100,viaSub:1500}};
+const MKS_SUB=800;
+let twScen="asis",twInit=false;
+function twPct(x){return Math.round(x*100)+"%";}
+function renderTwinWarn(){
+  const u=TW_UTIL[twScen],o=TW_OPS[twScen];const a=[];
+  u.forEach((x,i)=>{if(x>=.7)a.push({sev:"bad",src:"Dermaga",what:`Posisi sandar ${i+1} terisi ${twPct(x)}`,act:"Geser jendela feeder ke posisi 3 sampai 6 yang masih longgar"});else if(x>=.55)a.push({sev:"warn",src:"Dermaga",what:`Posisi sandar ${i+1} mendekati ambang (${twPct(x)})`,act:"Pantau pada jendela direct call berikutnya"});});
+  const big=u[0]>=.7||u[1]>=.7;
+  a.push({sev:big?"bad":"warn",src:"Crane",what:`Hanya 2 dari 6 QCC menjangkau ${o.qccRows} baris kontainer`,act:big?"Kapal besar di posisi 1 dan 2 hanya dilayani 2 crane. Prioritaskan upgrade outreach QCC":"Belum kritis, tetapi menjadi pembatas saat direct call kapal besar"});
+  if(o.yard>=.75)a.push({sev:"bad",src:"Yard",what:`Okupansi yard ${twPct(o.yard)}`,act:"Percepat evakuasi ke ICD dan batasi dwell di atas 3 hari"});
+  if(o.gateQ/o.gateCap>=.8)a.push({sev:"warn",src:"Gate",what:`${o.gateQ} truk eksternal aktif dari kapasitas ${o.gateCap}`,act:"Buka sistem slot truk dua jam sebelum cut-off"});
+  if(!a.length)a.push({sev:"good",src:"Aman",what:"Tidak ada bottleneck terdeteksi",act:"Semua aset di bawah ambang 70%"});
+  $("#twWarn").innerHTML=a.slice(0,4).map(alertHTML).join("");
+  const T=chartTheme(); if(!T) return;
+  mk("chBerth",{type:"bar",data:{labels:u.map((_,i)=>"Posisi "+(i+1)),datasets:[{data:u.map(x=>x*100),backgroundColor:u.map(x=>x>=.7?T.bad:x>=.55?T.warn:T.accent),borderRadius:6,maxBarThickness:42}]},
+    options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>"Okupansi "+Math.round(c.parsed.y)+"%"}}},scales:{y:{min:0,max:100,ticks:{callback:v=>v+"%"}},x:{grid:{display:false}}}},plugins:[lineAt(70,T.bad,"Ambang 70%")]});
+}
+function renderTwinPlan(){
+  const now=new Date(),cut=CUT,H=3600e3;
+  const t0=new Date(Math.min(now.getTime(),cut-30*H)),t1=new Date(cut.getTime()+34*H),span=t1-t0;
+  const x=t=>Math.max(0,Math.min(100,(t-t0)/span*100));
+  const bar=(a,b,cls,lab)=>`<div class="g-bar ${cls}" style="left:${x(a)}%;width:${Math.max(1.2,x(b)-x(a))}%" title="${lab}">${lab}</div>`;
+  const berthA=new Date(cut.getTime()+14*H),berthB=new Date(berthA.getTime()+18*H);
+  const feeders=FLEET.filter(u=>u.tipe==="Feeder"&&u.st!=="ARRIVED_MNP").map(u=>({u,a:new Date(now.getTime()+u.eta*H)}));
+  const late=feeders.filter(f=>f.a>cut);
+  const clash=feeders.filter(f=>{const b=new Date(f.a.getTime()+8*H);return f.a<berthB&&b>berthA;});
+  const icdEnd=new Date(cut.getTime()-(twScen==="tobe"?-2:3)*H);
+  const fmtT=d=>new Intl.DateTimeFormat("id-ID",{weekday:"short",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Makassar"}).format(d);
+  const ticks=[0,.25,.5,.75,1].map(f=>{const d=new Date(t0.getTime()+span*f);return `<span style="left:${f*100}%">${fmtT(d)}</span>`;}).join("");
+  const cutMark=`<div class="g-cut" style="left:${x(cut)}%"></div>`;
+  const rows=[
+   ["Feeder masuk",`${feeders.length} kapal`,feeders.map(f=>bar(f.a,new Date(f.a.getTime()+8*H),f.a>cut?"bad":clash.includes(f)?"bad":"gray",f.u.id)).join("")],
+   ["ICD / CFS","stuffing",bar(new Date(cut.getTime()-26*H),icdEnd,icdEnd>cut?"bad":"good","Stuffing")],
+   ["Truk ke dermaga","slot gate",bar(new Date(cut.getTime()-20*H),cut,"ink","Slot truk")],
+   ["Dermaga 1–2","direct call",bar(berthA,berthB,"","Kapal direct call")],
+   ["QCC Post-Panamax","CC-01, CC-02",bar(berthA,berthB,"","2 crane")],
+   ["QCC standar","CC-03 s.d. 06",bar(new Date(now.getTime()+2*H),new Date(cut.getTime()+10*H),"gray","Feeder")]
+  ];
+  $("#twGantt").innerHTML=`<div class="g-axis"><span></span><div class="g-ticks">${ticks}</div></div>`+rows.map(r=>`<div class="g-row"><div class="g-lab">${r[0]}<small>${r[1]}</small></div><div class="g-track">${r[2]}${cutMark}</div></div>`).join("")+
+    `<div class="g-row"><span></span><div style="position:relative;height:14px"><span class="g-cutlab" style="left:${x(cut)}%">Cut-off ${fmtT(cut)} WITA</span></div></div>`;
+  const a=[];
+  late.forEach(f=>a.push({sev:"bad",src:"Slot",what:`${f.u.id} tiba setelah cut-off`,act:`ETA ${fmtT(f.a)} WITA. Alihkan muatannya ke direct call berikutnya`}));
+  clash.filter(f=>!late.includes(f)).forEach(f=>a.push({sev:"warn",src:"Dermaga",what:`${f.u.id} bersamaan dengan jendela direct call`,act:"Sandarkan di posisi 3 sampai 6 dengan QCC standar"}));
+  if(icdEnd>cut)a.push({sev:"bad",src:"ICD",what:"Stuffing ICD selesai setelah cut-off",act:"Tambah satu shift CFS atau buka gudang KIMA lebih awal"});
+  if(!a.length)a.push({sev:"good",src:"Selaras",what:"Slot dermaga, crane, truk, dan ICD tidak bentrok",act:"Jadwal siap dikunci"});
+  $("#twPlan").innerHTML=a.slice(0,4).map(alertHTML).join("");
+}
+function renderTwinInv(){
+  const T0=+$("#twT").value,g=+$("#twG").value/100;
+  $("#oTwT").textContent=fmt(T0/1000)+" rb TEU/thn"; $("#oTwG").textContent=g*100+"% per tahun";
+  const cap=n=>n*QCC_TEU_YR, util=T0/cap(6), trig=.7*cap(6);
+  const yrs=T0>=trig?0:Math.log(trig/T0)/Math.log(1+g); const yr=2026+Math.ceil(yrs);
+  const ok=util<.7;
+  const v=$("#twInv"); v.style.background=ok?"var(--good-soft)":"var(--bad-soft)";
+  v.innerHTML=`${pillFor(ok?"good":"bad",ok?"Crane baru belum diperlukan":"Crane tambahan diperlukan")}<span class="big">Utilisasi 6 QCC ${String((util*100).toFixed(1)).replace(".",",")}%</span><span>${ok?`Ambang 70% tercapai pada ±${fmt(trig/1000)} rb TEU/tahun, sekitar tahun ${yr} dengan pertumbuhan ${Math.round(g*100)}%. Yang lebih mendesak adalah menaikkan outreach 1 QCC agar 3 crane bisa melayani kapal 16 sampai 17 baris.`:`Dengan 7 QCC utilisasi turun ke ${Math.round(T0/cap(7)*100)}%, dengan 8 QCC ke ${Math.round(T0/cap(8)*100)}%.`}</span>`;
+  const T=chartTheme(); if(!T) return;
+  const xs=[];for(let t=100000;t<=1200000;t+=50000)xs.push(t);
+  mk("chInv",{type:"line",data:{labels:xs.map(t=>fmt(t/1000)),datasets:[
+    {label:"6 QCC",data:xs.map(t=>Math.min(130,t/cap(6)*100)),borderColor:T.accent,borderWidth:2.5,pointRadius:0,tension:0},
+    {label:"7 QCC",data:xs.map(t=>Math.min(130,t/cap(7)*100)),borderColor:T.muted,borderWidth:1.6,borderDash:[4,3],pointRadius:0},
+    {label:"8 QCC",data:xs.map(t=>Math.min(130,t/cap(8)*100)),borderColor:T.line||"#c7c7cc",borderWidth:1.6,borderDash:[2,3],pointRadius:0},
+    {label:"Saat ini",data:xs.map(t=>Math.abs(t-T0)<25000?T0/cap(6)*100:null),borderColor:T.ink,backgroundColor:T.ink,pointRadius:6,pointStyle:"rectRot",showLine:false}
+  ]},options:{interaction:{mode:"index",intersect:false},plugins:{legend:{labels:{boxWidth:10,filter:i=>i.datasetIndex<3}},tooltip:{callbacks:{title:c=>c[0].label+" rb TEU/thn",label:c=>c.parsed.y==null?null:c.dataset.label+" "+Math.round(c.parsed.y)+"%"}}},
+    scales:{y:{min:0,max:110,ticks:{callback:v=>v+"%"}},x:{ticks:{maxTicksLimit:8},title:{display:true,text:"Throughput (ribu TEU per tahun)"}}}},plugins:[lineAt(70,T.bad,"Ambang investasi 70%")]});
+}
+function co2Chain(hubId,destKey){
+  const n=node(hubId),g=ROUTE_GEO[hubId],d=DEST[destKey];
+  const leg1=g?g.len:0, f1=n.moda==="sea"?CO2F.feeder:CO2F.truck;
+  const first=leg1*f1/1000;
+  const direct=first+CO2F.handle+d.direct*CO2F.mother/1000;
+  const via=first+CO2F.handle+MKS_SUB*CO2F.feeder/1000+CO2F.handle+d.viaSub*CO2F.mother/1000;
+  return {n,leg1,first,direct,via,save:1-direct/via};
+}
+function renderTwinCo2(){
+  const hub=$("#twHub").value||"imip",dest=$("#twDest").value||"sha";
+  const c=co2Chain(hub,dest),d=DEST[dest];
+  const k=x=>fmt(Math.round(x));
+  $("#twCo2").innerHTML=`<div class="co2c hi"><span>CO₂e per TEU · direct call MNP</span><b>${k(c.direct)}<small>kg</small></b><em>ISO 14083 · GLEC</em></div><div class="co2c"><span>Via transshipment Surabaya</span><b>${k(c.via)}<small>kg</small></b><span>tambahan 1 feeder dan 1 move</span></div><div class="co2c save"><span>Penghematan per TEU</span><b>${Math.round(c.save*100)}<small>%</small></b><span>${k(c.via-c.direct)} kg lebih rendah</span></div>`;
+  $("#twCo2Tbl").innerHTML=`<thead><tr><th>Asal</th><th>Leg pertama</th><th class="num">Jarak ke MNP</th><th class="num">Direct (kg/TEU)</th><th class="num">Via Surabaya</th><th class="num">Hemat</th></tr></thead><tbody>`+
+    NODES.map(n=>{const r=co2Chain(n.id,dest);return `<tr${n.id===hub?' style="background:var(--blue-soft)"':""}><td><b>${n.nama}</b></td><td>${n.moda==="sea"?"Feeder laut":"Truk darat"}</td><td class="num">${fmt(r.leg1)} km</td><td class="num">${k(r.direct)}</td><td class="num">${k(r.via)}</td><td class="num">${Math.round(r.save*100)}%</td></tr>`;}).join("")+`</tbody>`;
+}
+function renderTwin(){renderTwinWarn();renderTwinPlan();renderTwinInv();renderTwinCo2();}
+function showTwin(){
+  if(!twInit){twInit=true;
+    $("#twHub").innerHTML=NODES.map(n=>`<option value="${n.id}">${n.nama}</option>`).join("");
+    $("#twScen").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{twScen=b.dataset.s;$("#twScen").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));if(twScen==="tobe"&&+$("#twT").value<300000){$("#twT").value=Math.round(.85*.7*QCC_TEU_YR*6/5000)*5000;}else if(twScen==="asis"){$("#twT").value=155000;}renderTwin();}));
+    ["twT","twG"].forEach(id=>$("#"+id).addEventListener("input",renderTwinInv));
+    ["twHub","twDest"].forEach(id=>$("#"+id).addEventListener("change",renderTwinCo2));
+    $("#twTo3d").addEventListener("click",()=>show(ROLES[role]&&ROLES[role].mods.includes("model3d")?"model3d":firstMod()));
+  }
+  renderTwin();
+}
+
 /* ================= LIVE TRACKER ================= */
 // Rute skematik [lat, lon]; titik bernama menjadi checkpoint "sudah sampai mana".
 const MNP_LL=[-5.103,119.395];
@@ -1054,6 +1251,7 @@ const MODS={
  jaringan:{t:"Jaringan Konsolidasi",sub:"Peta",d:"Koridor laut dan darat, kinerja tiap hub",tag:()=>`${NODES.length} titik KTI`},
  partner:{t:"Partner",sub:"Kemitraan",d:"Pipeline, scorecard, dan heatmap komitmen",tag:()=>`${PARTNERS.length} partner`},
  armada:{t:"Tracker Armada",sub:"Truk & feeder",d:"Posisi unit dan risiko terhadap cut-off",tag:()=>`${FLEET.filter(u=>u.st!=="ARRIVED_MNP").length} unit aktif`},
+ twin:{t:"Digital Twin",sub:"Terminal",d:"Early warning, asset planning, investment check, dan green proof",tag:()=>"4 fungsi"},
  model3d:{t:"Model 3D",sub:"Hologram",d:"Simulasi terminal MNP dalam 3D dengan mode hologram dan Digital Twin",tag:()=>"mode hologram"},
  proyeksi:{t:"Proyeksi & Direct Call",sub:"Simulasi",d:"Tiga skenario volume dan titik impas",tag:()=>`ambang ${fmt(threshold())} TEU/minggu`},
  laporan:{t:"Laporan Bulanan",sub:"Ekspor",d:"Ringkasan kinerja untuk rapat direksi",soon:true},
@@ -1062,12 +1260,12 @@ const MODS={
  dokumen:{t:"Dokumen & Bea Cukai",sub:"Kepatuhan",d:"Status PEB, karantina, dan SLA jalur prioritas",soon:true}
 };
 const ROLES={
- manajemen:{nama:"Manajemen MNP",grup:"Manajemen & Komersial",d:"Kinerja konsolidasi, partner, dan kelayakan direct call",mods:["ringkasan","proyeksi","partner","jaringan","armada","model3d","laporan"]},
- operator:{nama:"Operator Terminal MNP",grup:"Operasi Terminal",d:"Kedatangan armada dan kesiapan cut-off",mods:["armada","jaringan","ringkasan","model3d","dermaga"]},
+ manajemen:{nama:"Manajemen MNP",grup:"Manajemen & Komersial",d:"Kinerja konsolidasi, partner, dan kelayakan direct call",mods:["ringkasan","proyeksi","partner","jaringan","armada","twin","model3d","laporan"]},
+ operator:{nama:"Operator Terminal MNP",grup:"Operasi Terminal",d:"Kedatangan armada dan kesiapan cut-off",mods:["armada","twin","jaringan","ringkasan","model3d"]},
  koordinator:{nama:"Koordinator Titik Konsolidasi",grup:"Hub Konsolidasi KTI",d:"Kinerja hub, dwell, dan unit yang berangkat",mods:["jaringan","armada","model3d","slot"]},
- partner:{nama:"Partner (Shipper & Carrier)",grup:"Shipper & Carrier",d:"Komitmen volume dan peluang direct call",mods:["partner","proyeksi","model3d","slot","dokumen"]}
+ partner:{nama:"Partner (Shipper & Carrier)",grup:"Shipper & Carrier",d:"Komitmen volume dan peluang direct call",mods:["partner","proyeksi","twin","model3d","slot","dokumen"]}
 };
-const MODVIEWS=["ringkasan","jaringan","partner","armada","proyeksi","model3d"];
+const MODVIEWS=["ringkasan","jaringan","partner","armada","proyeksi","twin","model3d"];
 let role=null; try{role=localStorage.getItem("mnp-role")}catch(e){} if(!ROLES[role]) role=null;
 
 function renderRoleCards(){
@@ -1096,6 +1294,7 @@ function show(v){
   try{history.replaceState(null,"","#"+v)}catch(e){}
   try{localStorage.setItem("kti-tab",v)}catch(e){}
   if(v==="armada") showTracker();
+  if(v==="twin") showTwin();
   const f3=document.getElementById("m3dFrame"); if(v==="model3d"&&f3&&!f3.getAttribute("src")) f3.setAttribute("src","model-3d.html?holo=1");
 
   window.scrollTo(0,0);
