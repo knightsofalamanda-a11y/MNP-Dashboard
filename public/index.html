@@ -1313,7 +1313,10 @@ $("#ctaMgmt").addEventListener("click",()=>setRole("manajemen"));
 renderCutLabel(); tick(); setInterval(tick,1000);
 readSim(); renderKPIs(); renderNodeTables(); drawMap(); renderPartners(); renderFleet(); renderAlerts(); renderRoleCards(); renderPortal();
 let start=(location.hash||"").slice(1); if(!start){try{start=localStorage.getItem("kti-tab")||""}catch(e){}}
+// Link langsung: #twin, #armada, dst. Bila peran aktif tidak punya modul itu, pakai peran pertama yang punya.
+if(start&&MODVIEWS.includes(start)&&(!role||!ROLES[role].mods.includes(start))){const k=Object.keys(ROLES).find(r=>ROLES[r].mods.includes(start));if(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();}}
 show(start||"peran");
+window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(h&&h!==document.querySelector(".view:not([hidden])")?.dataset.view){if(MODVIEWS.includes(h)&&(!role||!ROLES[role].mods.includes(h))){const k=Object.keys(ROLES).find(r=>ROLES[r].mods.includes(h));if(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();}}show(h);}});
 drawAll();
 })();
 </script>
