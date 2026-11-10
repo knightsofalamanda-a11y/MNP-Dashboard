@@ -893,8 +893,17 @@ function initTracker(){
   if(!window.L){$("#trkFallback").hidden=false;renderTrkList();return;}
   trkMap=L.map(el,{zoomControl:true,attributionControl:true,scrollWheelZoom:true,worldCopyJump:false}).setView([-4.6,121.4],7);
   trkMap.zoomControl.setPosition("topright");
-  const tiles=L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'}).addTo(trkMap);
-  let tileErr=0; tiles.on("tileerror",()=>{if(++tileErr>12){const fb=$("#trkFallback");fb.textContent="Tile peta tidak dapat dimuat dari jaringan ini. Posisi unit dan daftar di samping tetap diperbarui.";fb.hidden=false;}});
+  // Basemap tanpa API key: Esri Light Gray (utama) dengan label, cadangan otomatis ke OpenStreetMap bila gagal dimuat.
+  const ESRI="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/";
+  const esriAttr='Tiles &copy; <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a>, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
+  let base=L.tileLayer(ESRI+"World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",{maxZoom:16,attribution:esriAttr}).addTo(trkMap);
+  let ref=L.tileLayer(ESRI+"World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}",{maxZoom:16,pane:"overlayPane",opacity:.9}).addTo(trkMap);
+  let tileErr=0,tileOk=0,switched=false;
+  const toOSM=()=>{if(switched)return;switched=true;trkMap.removeLayer(base);trkMap.removeLayer(ref);tileErr=0;
+    base=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'}).addTo(trkMap);
+    base.on("tileerror",()=>{if(++tileErr>12){const fb=$("#trkFallback");fb.textContent="Tile peta tidak dapat dimuat dari jaringan ini. Posisi unit dan daftar di samping tetap diperbarui.";fb.hidden=false;}});};
+  base.on("tileload",()=>tileOk++);
+  base.on("tileerror",()=>{if(++tileErr>4&&tileOk===0)toOSM();});
   NODES.forEach(n=>{
     const g=ROUTE_GEO[n.id]; if(!g) return;
     const casing=L.polyline(g.ll,{color:"#ffffff",weight:9,opacity:.9,interactive:false}).addTo(trkMap);
