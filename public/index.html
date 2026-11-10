@@ -292,6 +292,8 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
 .tw-link{appearance:none;border:0;background:none;color:var(--blue);font:400 15px var(--f-body);cursor:pointer;padding:0}
 .tw-link:hover{text-decoration:underline}
 .tw-card h2{margin-top:6px}
+.tw-card{scroll-margin-top:120px}
+.tw-card.flash{box-shadow:0 0 0 3px var(--focus)}
 .tw-k{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--blue);text-transform:none}
 .tw-num{width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:12px}
 .tw-sel{appearance:none;-webkit-appearance:none;border:1px solid var(--hair);background:var(--canvas);border-radius:999px;padding:6px 30px 6px 14px;font:400 14px var(--f-body);color:var(--ink);background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px;background-repeat:no-repeat;max-width:100%}
@@ -636,7 +638,7 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
       </div>
     </div>
 
-    <div class="panel c6 tw-card">
+    <div class="panel c6 tw-card" id="early-warning">
       <div class="tw-k"><span class="tw-num">1</span>Early warning</div>
       <h2>Bottleneck terlihat sebelum mengganggu operasi</h2>
       <p class="sub">Okupansi per posisi sandar (6 × 177 m dari dermaga 1.062 m) dibandingkan ambang 70%.</p>
@@ -644,7 +646,7 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
       <ul class="alerts" id="twWarn" style="margin-top:16px"></ul>
     </div>
 
-    <div class="panel c6 tw-card">
+    <div class="panel c6 tw-card" id="asset-planning">
       <div class="tw-k"><span class="tw-num">2</span>Asset planning</div>
       <h2>Slot dermaga, crane, truk, dan ICD selaras</h2>
       <p class="sub">Jendela direct call berikutnya. Bentrokan jadwal ditandai merah.</p>
@@ -652,7 +654,7 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
       <ul class="alerts" id="twPlan" style="margin-top:16px"></ul>
     </div>
 
-    <div class="panel c6 tw-card">
+    <div class="panel c6 tw-card" id="investment-check">
       <div class="tw-k"><span class="tw-num">3</span>Investment check</div>
       <h2>Kapan crane tambahan benar-benar dibutuhkan</h2>
       <p class="sub">Utilisasi QCC terhadap throughput tahunan untuk 6, 7, dan 8 crane. Investasi layak saat utilisasi melewati 70%.</p>
@@ -664,7 +666,7 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
       <div class="verdict" id="twInv" style="margin-top:14px"></div>
     </div>
 
-    <div class="panel c6 tw-card">
+    <div class="panel c6 tw-card" id="green-proof">
       <div class="tw-k"><span class="tw-num">4</span>Green proof</div>
       <h2>CO₂e per TEU untuk carrier</h2>
       <p class="sub">Dihitung per rantai pengiriman dengan kerangka ISO 14083 dan GLEC: jarak × faktor emisi per moda, ditambah emisi penanganan di terminal.</p>
@@ -1312,11 +1314,14 @@ $("#ctaPilih").addEventListener("click",()=>{$("#pilih").scrollIntoView({behavio
 $("#ctaMgmt").addEventListener("click",()=>setRole("manajemen"));
 renderCutLabel(); tick(); setInterval(tick,1000);
 readSim(); renderKPIs(); renderNodeTables(); drawMap(); renderPartners(); renderFleet(); renderAlerts(); renderRoleCards(); renderPortal();
-let start=(location.hash||"").slice(1); if(!start){try{start=localStorage.getItem("kti-tab")||""}catch(e){}}
+const TW_ANCHORS=["early-warning","asset-planning","investment-check","green-proof"];
+function goAnchor(a){setTimeout(()=>{const el=document.getElementById(a);if(!el)return;el.scrollIntoView({behavior:RM?"auto":"smooth",block:"start"});el.classList.add("flash");setTimeout(()=>el.classList.remove("flash"),1600);},250);}
+let start=(location.hash||"").slice(1); let anchor=null; if(TW_ANCHORS.includes(start)){anchor=start;start="twin";}
+if(!start){try{start=localStorage.getItem("kti-tab")||""}catch(e){}}
 // Link langsung: #twin, #armada, dst. Bila peran aktif tidak punya modul itu, pakai peran pertama yang punya.
 if(start&&MODVIEWS.includes(start)&&(!role||!ROLES[role].mods.includes(start))){const k=Object.keys(ROLES).find(r=>ROLES[r].mods.includes(start));if(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();}}
-show(start||"peran");
-window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(h&&h!==document.querySelector(".view:not([hidden])")?.dataset.view){if(MODVIEWS.includes(h)&&(!role||!ROLES[role].mods.includes(h))){const k=Object.keys(ROLES).find(r=>ROLES[r].mods.includes(h));if(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();}}show(h);}});
+show(start||"peran"); if(anchor){try{history.replaceState(null,"","#"+anchor)}catch(e){} goAnchor(anchor);}
+window.addEventListener("hashchange",()=>{let h=location.hash.slice(1);if(TW_ANCHORS.includes(h)){const a=h;h="twin";if(document.querySelector(".view:not([hidden])")?.dataset.view!=="twin"){if(!role||!ROLES[role].mods.includes("twin")){role="manajemen";try{localStorage.setItem("mnp-role",role)}catch(e){}renderPortal();}show("twin");try{history.replaceState(null,"","#"+a)}catch(e){}}goAnchor(a);return;}if(h&&h!==document.querySelector(".view:not([hidden])")?.dataset.view){if(MODVIEWS.includes(h)&&(!role||!ROLES[role].mods.includes(h))){const k=Object.keys(ROLES).find(r=>ROLES[r].mods.includes(h));if(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();}}show(h);}});
 drawAll();
 })();
 </script>
