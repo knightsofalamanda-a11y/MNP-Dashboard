@@ -514,7 +514,6 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
       <button class="tab" role="tab" data-v="ringkasan" id="t-ringkasan">Ringkasan</button>
       <button class="tab" role="tab" data-v="jaringan" id="t-jaringan">Jaringan Konsolidasi</button>
       <button class="tab" role="tab" data-v="partner" id="t-partner">Partner</button>
-      <button class="tab" role="tab" data-v="armada" id="t-armada">Tracker Armada</button>
       <button class="tab" role="tab" data-v="proyeksi" id="t-proyeksi">Proyeksi &amp; Direct Call</button>
       <button class="tab" role="tab" data-v="twin" id="t-twin">Digital Twin</button>
       <button class="tab" role="tab" data-v="pva" id="t-pva">Plan vs Actual</button>
@@ -746,7 +745,7 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
 
     <div class="panel c4">
       <h2>Peringatan dari hulu KTI</h2>
-      <p class="sub">Dari tracker armada. Yard plan disesuaikan sebelum terjadi penyimpangan.</p>
+      <p class="sub">Dari pemantauan feeder dan truk KTI. Yard plan disesuaikan sebelum terjadi penyimpangan.</p>
       <div class="pva-up" id="pvaUp"></div>
     </div>
 
@@ -1514,12 +1513,12 @@ const MODS={
  dokumen:{t:"Dokumen & Bea Cukai",sub:"Kepatuhan",d:"Status PEB, karantina, dan SLA jalur prioritas",soon:true}
 };
 const ROLES={
- manajemen:{nama:"Manajemen MNP",grup:"Manajemen & Komersial",d:"Kinerja konsolidasi, partner, dan kelayakan direct call",mods:["ringkasan","proyeksi","partner","jaringan","armada","twin","pva","model3d","laporan"]},
- operator:{nama:"Operator Terminal MNP",grup:"Operasi Terminal",d:"Kedatangan armada dan kesiapan cut-off",mods:["armada","pva","twin","jaringan","ringkasan","model3d"]},
- koordinator:{nama:"Koordinator Titik Konsolidasi",grup:"Hub Konsolidasi KTI",d:"Kinerja hub, dwell, dan unit yang berangkat",mods:["jaringan","armada","model3d","slot"]},
+ manajemen:{nama:"Manajemen MNP",grup:"Manajemen & Komersial",d:"Kinerja konsolidasi, partner, dan kelayakan direct call",mods:["ringkasan","proyeksi","partner","jaringan","twin","pva","model3d","laporan"]},
+ operator:{nama:"Operator Terminal MNP",grup:"Operasi Terminal",d:"Kedatangan armada dan kesiapan cut-off",mods:["pva","twin","jaringan","ringkasan","model3d"]},
+ koordinator:{nama:"Koordinator Titik Konsolidasi",grup:"Hub Konsolidasi KTI",d:"Kinerja hub, dwell, dan unit yang berangkat",mods:["jaringan","model3d","slot"]},
  partner:{nama:"Partner (Shipper & Carrier)",grup:"Shipper & Carrier",d:"Komitmen volume dan peluang direct call",mods:["partner","proyeksi","twin","model3d","slot","dokumen"]}
 };
-const MODVIEWS=["ringkasan","jaringan","partner","armada","proyeksi","twin","pva","model3d"];
+const MODVIEWS=["ringkasan","jaringan","partner","proyeksi","twin","pva","model3d"];
 let role=null; try{role=localStorage.getItem("mnp-role")}catch(e){} if(!ROLES[role]) role=null;
 
 function renderRoleCards(){
