@@ -281,6 +281,85 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
 
 
 
+
+/* ===== Plan vs Actual ===== */
+.pva-thesis{align-items:center}
+.pva-kpis{grid-column:span 12;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+@media (max-width:1100px){.pva-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:560px){.pva-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pva-kpis .pk{background:var(--canvas);border:1px solid var(--hair);border-radius:18px;padding:16px 18px;min-width:0}
+.pva-kpis .pk span{font-size:12.5px;color:var(--muted)}
+.pva-kpis .pk b{display:block;font-family:var(--f-display);font-size:34px;font-weight:600;letter-spacing:-.025em;margin:4px 0 2px;font-variant-numeric:tabular-nums;line-height:1.1}
+.pva-kpis .pk b small{font-size:15px;font-weight:400;color:var(--muted);margin-left:3px}
+.pva-kpis .pk em{font-style:normal;font-size:12px}
+.t-good{color:var(--good)}.t-bad{color:var(--bad)}.t-warn{color:var(--warn)}
+.pva-gantt{display:grid;gap:8px;min-width:0;overflow:hidden}
+.pv-axis,.pv-row{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center}
+@media (max-width:640px){.pv-axis,.pv-row{grid-template-columns:96px minmax(0,1fr)}}
+.pv-ticks{position:relative;height:18px;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.pv-ticks span{position:absolute;transform:translateX(-50%)}
+.pv-ticks span:first-child{transform:none}.pv-ticks span:last-child{transform:translateX(-100%)}
+.pv-lab{font-size:13px;line-height:1.2;min-width:0}.pv-lab small{display:block;color:var(--muted);font-size:11.5px}
+.pv-track{position:relative;height:38px;background:var(--parchment);border-radius:8px}
+.pv-pl{position:absolute;top:4px;height:13px;border:1.5px dashed #a1a1a6;border-radius:4px;background:rgba(255,255,255,.7)}
+.pv-ac{position:absolute;bottom:4px;height:15px;border-radius:4px;background:var(--blue);color:#fff;font-size:10px;font-weight:600;padding:0 6px;display:flex;align-items:center;white-space:nowrap;overflow:hidden}
+.pv-ac.late{background:var(--bad)}.pv-ac.ok{background:var(--good)}
+.pv-ac.run{background:repeating-linear-gradient(90deg,var(--blue) 0 6px,#3d8ae0 6px 12px)}
+.pv-now{position:absolute;top:-6px;bottom:-6px;border-left:2px solid var(--ink);z-index:3}
+.pv-nowlab{position:absolute;top:-24px;transform:translateX(-50%);font-size:11px;font-weight:600;background:var(--ink);color:#fff;border-radius:6px;padding:1px 7px;white-space:nowrap}
+.pv-flag{position:absolute;top:-8px;z-index:4;background:var(--bad);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:1px 7px;white-space:nowrap;box-shadow:0 0 0 2px #fff;transform:translateX(-50%)}
+.pva-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px;font-size:12px;color:var(--muted)}
+.pva-legend span{display:inline-flex;gap:6px;align-items:center}
+.pva-legend i{width:22px;height:10px;border-radius:3px}
+.lg-p{border:1.5px dashed #a1a1a6}.lg-g{background:var(--good)}.lg-b{background:var(--blue)}.lg-r{background:var(--bad)}
+.pva-cmp{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.pva-cmp{grid-template-columns:1fr}}
+.pva-cmp>div{border-radius:14px;padding:14px 16px}
+.pva-cmp .old{background:var(--parchment)}.pva-cmp .new{background:var(--blue-soft)}
+.pva-cmp h4{margin:0 0 8px;font-size:13px;font-weight:600}.pva-cmp .new h4{color:var(--blue)}
+.pva-cmp ol{margin:0;padding-left:18px;display:grid;gap:5px;font-size:12.5px;color:var(--ink-80)}
+.pva-ibh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.pva-ibh b{font-size:12px;background:var(--bad-soft);color:var(--bad);border-radius:999px;padding:2px 10px;white-space:nowrap}
+.pva-ibh b.zero{background:var(--good-soft);color:var(--good)}
+.pv-al{border:1px solid var(--hair);border-radius:14px;padding:14px;margin-top:10px;display:grid;gap:8px;cursor:pointer;text-align:left;background:var(--canvas)}
+.pv-al.sel{border:2px solid var(--focus);padding:13px}
+.pv-al.done{opacity:.6}
+.pv-al .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.pv-al .w{font-size:15px;font-weight:600;letter-spacing:-.015em}
+.pv-al .m{font-size:12.5px;color:var(--muted)}
+.pv-reasons{display:flex;flex-wrap:wrap;gap:6px}
+.pv-reasons button{appearance:none;font:400 12px var(--f-body);color:var(--ink);background:var(--canvas);border:1px solid var(--hair);border-radius:999px;padding:4px 10px;cursor:pointer}
+.pv-reasons button[aria-pressed="true"]{border:2px solid var(--blue);padding:3px 9px;color:var(--blue);font-weight:600}
+.pv-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pv-btn{appearance:none;border:0;background:var(--blue);color:#fff;border-radius:999px;padding:6px 14px;font:600 12.5px var(--f-body);cursor:pointer}
+.pv-btn.ghost{background:transparent;color:var(--blue);padding:6px 4px}
+.pv-btn:active{transform:scale(.95)}
+.pv-timer{margin-left:auto;font-size:12px;color:var(--warn);font-variant-numeric:tabular-nums}
+.pva-bars{display:none}
+.pva-insight{margin-top:14px;background:var(--parchment);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.45}
+.pva-up{display:grid;gap:10px}
+.pv-uw{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;padding:12px 14px;border-radius:12px;background:var(--parchment)}
+.pv-uw .ic{grid-row:span 2;width:34px;height:34px;border-radius:10px;background:var(--blue);display:grid;place-items:center;color:#fff}
+.pv-uw .ic.road{background:#3a3a3c}.pv-uw .ic.ok{background:var(--good)}
+.pv-uw .ic svg{width:18px;height:18px}
+.pv-uw b{font-size:14px;font-weight:600}.pv-uw span{font-size:12.5px;color:var(--muted)}
+.pva-phone{background:#1d1d1f;border-radius:30px;padding:12px;max-width:300px;margin:0 auto}
+.pva-scr{background:#fff;border-radius:22px;padding:16px 14px 18px;display:grid;gap:10px}
+.pva-scr .pv-bar{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.pva-scr h3{margin:0;font-size:16px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
+.pva-scr p{margin:0;font-size:12px;color:var(--muted)}
+.pva-scr .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pva-scr .g2 button{appearance:none;border:1px solid var(--hair);background:#fff;border-radius:12px;padding:10px 6px;font:600 12px var(--f-body);color:var(--ink);cursor:pointer}
+.pva-scr .g2 button[aria-pressed="true"]{border:2px solid var(--blue);color:var(--blue);background:var(--blue-soft);padding:9px 5px}
+.pva-scr .send{appearance:none;border:0;background:var(--blue);color:#fff;border-radius:999px;padding:10px;font:600 13px var(--f-body);cursor:pointer}
+.pva-scr .send:disabled{background:#c7c7cc;cursor:default}
+.pva-scr .okmsg{background:var(--good-soft);color:var(--good);border-radius:12px;padding:12px;font-size:13px;font-weight:600;text-align:center}
+.pva-cap{text-align:center;font-size:12px;color:var(--muted);margin:10px 0 0}
+.pva-foot{font-size:12px;color:var(--muted);margin:0}
+.panel.c3{grid-column:span 3}
+@media (max-width:1180px){.panel.c3{grid-column:span 6}}
+@media (max-width:980px){.panel.c3{grid-column:span 12}}
+#deteksi-penyimpangan,#pareto-penyebab,#lapor-satu-ketukan{scroll-margin-top:120px}
 /* ===== Digital Twin ===== */
 .tw-thesis{align-items:center}
 .tw-eyebrow{font-size:14px;font-weight:600;color:var(--blue)}
@@ -438,6 +517,7 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
       <button class="tab" role="tab" data-v="armada" id="t-armada">Tracker Armada</button>
       <button class="tab" role="tab" data-v="proyeksi" id="t-proyeksi">Proyeksi &amp; Direct Call</button>
       <button class="tab" role="tab" data-v="twin" id="t-twin">Digital Twin</button>
+      <button class="tab" role="tab" data-v="pva" id="t-pva">Plan vs Actual</button>
       <button class="tab" role="tab" data-v="model3d" id="t-model3d">Model 3D</button>
       <span id="soonTabs" class="soon-tabs"></span>
     </nav>
@@ -624,6 +704,61 @@ footer.foot p{margin:0;max-width:90ch;letter-spacing:-.01em}
       <div class="chart-box"><canvas id="chBE" aria-label="Grafik titik impas direct call"></canvas></div>
     </div>
   </section>
+  <!-- PLAN VS ACTUAL -->
+  <section class="view wrap" data-view="pva" hidden>
+    <div class="panel thesis pva-thesis">
+      <div>
+        <span class="tw-eyebrow">Digital Twin · Plan vs Actual</span>
+        <p class="tw-claim">Penyimpangan terdeteksi otomatis, alasan tercatat tanpa telepon.</p>
+        <p class="tw-lead">Rencana yard plan dan work queue TOS dibandingkan dengan kejadian aktual QCC, RTG, truk internal, dan gate setiap 30 detik.</p>
+      </div>
+      <div class="tw-side">
+        <span class="live-pill"><i></i><span id="pvaPing">Data TOS masuk 12 detik lalu</span></span>
+        <div class="filters" id="pvaShift"><button class="chip" aria-pressed="true" data-s="pagi">Shift pagi</button><button class="chip" aria-pressed="false" data-s="siang">Shift siang</button><button class="chip" aria-pressed="false" data-s="malam">Shift malam</button></div>
+      </div>
+    </div>
+    <div class="kpis pva-kpis" id="pvaKpis"></div>
+
+    <div class="panel c8" id="deteksi-penyimpangan">
+      <h2>Deteksi Penyimpangan</h2>
+      <p class="sub">Rencana TOS dibandingkan otomatis dengan kejadian aktual setiap alat. Penyimpangan langsung ditandai tanpa pemantauan CCTV manual.</p>
+      <div class="pva-gantt" id="pvaGantt"></div>
+      <div class="pva-legend"><span><i class="lg-p"></i>Rencana TOS</span><span><i class="lg-g"></i>Selesai sesuai rencana</span><span><i class="lg-b"></i>Berjalan</span><span><i class="lg-r"></i>Menyimpang dari rencana</span></div>
+      <div class="pva-cmp">
+        <div class="old"><h4>Sekarang: CCTV dan telepon</h4><ol><li>Pegawai ruang kontrol membandingkan rencana 3D dengan CCTV secara manual</li><li>Keterlambatan baru terlihat bila kebetulan sedang dipantau</li><li>Operator ditelepon untuk menanyakan penyebab</li><li>Penyebab tidak tercatat, tidak bisa dianalisis</li></ol></div>
+        <div class="new"><h4>Dengan Plan vs Actual</h4><ol><li>Sistem membandingkan rencana TOS dengan kejadian alat setiap 30 detik</li><li>Penyimpangan di atas ambang langsung masuk kotak penyimpangan</li><li>Operator memilih penyebab dengan satu ketukan, telepon hanya bila tidak dijawab</li><li>Semua penyebab tercatat dan diringkas menjadi rekomendasi</li></ol></div>
+      </div>
+    </div>
+
+    <div class="panel c4 pva-inbox">
+      <div class="pva-ibh"><h2>Kotak penyimpangan</h2><b id="pvaActive"></b></div>
+      <p class="sub">Dikirim otomatis ke operator alat. Telepon hanya bila tidak dijawab.</p>
+      <div id="pvaInbox"></div>
+    </div>
+
+    <div class="panel c5" id="pareto-penyebab">
+      <h2>Pareto Penyebab</h2>
+      <p class="sub" id="pvaParSub"></p>
+      <div class="chart-box" style="height:260px"><canvas id="chPareto" aria-label="Diagram Pareto penyebab penyimpangan"></canvas></div>
+      <div class="pva-bars" id="pvaBars"></div>
+      <div class="pva-insight" id="pvaInsight"></div>
+    </div>
+
+    <div class="panel c4">
+      <h2>Peringatan dari hulu KTI</h2>
+      <p class="sub">Dari tracker armada. Yard plan disesuaikan sebelum terjadi penyimpangan.</p>
+      <div class="pva-up" id="pvaUp"></div>
+    </div>
+
+    <div class="panel c3" id="lapor-satu-ketukan">
+      <h2>Lapor Satu Ketukan</h2>
+      <p class="sub">Operator memilih penyebab keterlambatan dengan satu ketukan. Jawaban tercatat otomatis dan menggantikan telepon dari ruang kontrol.</p>
+      <div class="pva-phone"><div class="pva-scr" id="pvaPhone"></div></div>
+      <p class="pva-cap">Coba pilih penyebab lalu kirim. Kotak penyimpangan dan Pareto ikut diperbarui.</p>
+    </div>
+    <p class="pva-foot c12">Simulasi untuk case competition. Seluruh angka, kapal, dan unit bersifat ilustratif. Integrasi mengasumsikan TOS menyediakan data rencana dan kejadian alat secara elektronik.</p>
+  </section>
+
   <!-- DIGITAL TWIN -->
   <section class="view wrap" data-view="twin" hidden>
     <div class="panel thesis tw-thesis">
@@ -953,6 +1088,122 @@ function renderFleet(){
 
 
 
+
+/* ================= PLAN VS ACTUAL ================= */
+const PV_REASONS=["Truk internal belum datang","Re-handling tumpukan","Feeder atau truk KTI terlambat","Alat gangguan","Dokumen belum lengkap","Cuaca"];
+const PV_BASE={pagi:[58,30,21,14,9,5],siang:[41,36,12,19,6,8],malam:[33,22,26,11,14,3]};
+const PV_SHIFT={pagi:{t0:6,now:8.87,moves:1284,done:.62,ontime:91},siang:{t0:14,now:16.4,moves:1120,done:.48,ontime:88},malam:{t0:22,now:24.9,moves:860,done:.55,ontime:93}};
+const PV_ROWS=[
+ {id:"QCC-01",sub:"Kapal MV Sinar Sunda · bay 12",seg:[[.04,.30,.04,.29,"ok","Bongkar 46 box"],[.38,.34,.39,.19,"run","Muat 31/52"]]},
+ {id:"QCC-02",sub:"Kapal MV Sinar Sunda · bay 18",seg:[[.06,.28,.07,.28,"ok","Bongkar 40"],[.36,.30,.37,.21,"run","Muat 28/45"]]},
+ {id:"RTG-07",sub:"Blok B3 · stacking ekspor",seg:[[.10,.22,.10,.22,"ok","B3 baris 1–4"],[.34,.16,.34,.24,"late","Terlambat +22 m"]],flag:[.48,"+22 m"]},
+ {id:"RTG-11",sub:"Blok C1 · reefer",seg:[[.16,.26,.17,.25,"ok","C1 reefer"],[.46,.24,.47,.11,"run","C1 lanjut"]]},
+ {id:"Truk internal",sub:"Grup A · 6 unit",seg:[[.04,.62,.04,.38,"","Siklus 11,2 m"],[null,null,.42,.16,"late","Siklus 16,4 m"]],flag:[.50,"antre"]},
+ {id:"Gate in ekspor",sub:"Slot truk eksternal",seg:[[0,1,0,.44,"ok","126 truk sesuai slot"],[null,null,.44,.14,"late","9 di luar slot"]]}
+];
+let pvShift="pagi",pvSel=0,pvPick=null,pvInit=false,pvPing=12;
+let PV_ALERTS=[];
+function pvResetAlerts(){
+  PV_ALERTS=[
+   {unit:"RTG-07 · Blok B3",sev:"bad",time:"08.30",what:"Stacking ekspor terlambat 22 menit",needReason:true,reason:null,answered:false,eta:null},
+   {unit:"Truk internal · Grup A",sev:"warn",time:"08.41",what:"Siklus naik ke 16,4 menit dari 11 menit",action:"Tambah 2 truk dari Grup C",done:false},
+   {unit:"Gate in ekspor",sev:"warn",time:"08.47",what:"9 truk datang di luar slot",note:"3 di antaranya membawa kargo untuk direct call Jumat.",action:"Kirim notifikasi ke forwarder",done:false},
+   {unit:"QCC-01",sev:"bad",time:"08.50",what:"Muat bay 12 diprediksi selesai 10 menit melewati rencana",needReason:true,reason:null,answered:false,esc:168}
+  ];
+  pvSel=0;pvPick=null;
+}
+let PV_COUNTS=PV_BASE.pagi.slice();
+function pvOpen(){return PV_ALERTS.filter(a=>a.needReason?!a.answered:!a.done).length;}
+function pvWaiting(){return PV_ALERTS.filter(a=>a.needReason&&!a.answered).length;}
+function renderPvKpis(){
+  const sh=PV_SHIFT[pvShift],open=pvOpen(),wait=pvWaiting();
+  $("#pvaKpis").innerHTML=[
+   `<div class="pk"><span>Pekerjaan shift ini</span><b>${fmt(sh.moves)}<small>move</small></b><em class="muted">${Math.round(sh.done*100)}% selesai</em></div>`,
+   `<div class="pk"><span>Tepat waktu</span><b>${sh.ontime}<small>%</small></b><em class="t-good">▲ 3 poin dari kemarin</em></div>`,
+   `<div class="pk"><span>Penyimpangan aktif</span><b class="${open?"t-bad":"t-good"}">${open}</b><em class="${open?"t-bad":"t-good"}">${open?PV_ALERTS.filter(a=>a.sev==="bad"&&(a.needReason?!a.answered:!a.done)).length+" kritis":"semua tertangani"}</em></div>`,
+   `<div class="pk"><span>Menunggu alasan operator</span><b class="${wait?"t-warn":"t-good"}">${wait}</b><em class="${wait?"t-warn":"t-good"}">${wait?"eskalasi otomatis dalam 3 menit":"semua sudah dijawab"}</em></div>`,
+   `<div class="pk"><span>Waktu respons rata-rata</span><b>1,8<small>menit</small></b><em class="t-good">sebelumnya ±9 menit via telepon</em></div>`
+  ].join("");
+  const b=$("#pvaActive"); b.textContent=open?open+" aktif":"tuntas"; b.classList.toggle("zero",!open);
+}
+function renderPvGantt(){
+  const sh=PV_SHIFT[pvShift],nowF=(sh.now-sh.t0)/5;
+  const hh=h=>String(Math.floor(h%24)).padStart(2,"0")+"."+String(Math.round((h%1)*60)).padStart(2,"0");
+  const ticks=[0,1,2,3,4,5].map(i=>`<span style="left:${i*20}%">${hh(sh.t0+i)}</span>`).join("");
+  $("#pvaGantt").innerHTML=`<div class="pv-axis"><span></span><div class="pv-ticks">${ticks}</div></div><div style="height:10px"></div>`+
+   PV_ROWS.map((r,ri)=>`<div class="pv-row"><div class="pv-lab">${r.id}<small>${r.sub}</small></div><div class="pv-track">${r.seg.map(g=>`${g[0]!=null?`<div class="pv-pl" style="left:${g[0]*100}%;width:${g[1]*100}%"></div>`:""}<div class="pv-ac ${g[4]}" style="left:${g[2]*100}%;width:${g[3]*100}%">${g[5]}</div>`).join("")}${r.flag?`<span class="pv-flag" style="left:${r.flag[0]*100}%">${r.flag[1]}</span>`:""}<div class="pv-now" style="left:${nowF*100}%">${ri===0?`<span class="pv-nowlab">${hh(sh.now)}</span>`:""}</div></div></div>`).join("");
+}
+function renderPvInbox(){
+  $("#pvaInbox").innerHTML=PV_ALERTS.map((a,i)=>{
+    const closed=a.needReason?a.answered:a.done;
+    let body="";
+    if(a.needReason){
+      if(a.answered) body=`<div class="pv-acts"><span class="pill p-good">Dijawab operator: ${a.reason}</span></div>`;
+      else if(pvSel!==i) body=`<div class="pv-acts"><span class="pill p-warn">Menunggu alasan</span>${a.esc!=null?`<span class="pv-timer" data-esc="${i}">eskalasi ${String(Math.floor(a.esc/60)).padStart(2,"0")}:${String(a.esc%60).padStart(2,"0")}</span>`:""}</div>`;
+      else body=`<div class="pv-reasons">${PV_REASONS.slice(0,5).map(r=>`<button data-a="${i}" data-r="${r}" aria-pressed="${pvSel===i&&pvPick===r}">${r}</button>`).join("")}</div><div class="pv-acts"><span class="pill p-warn">Menunggu alasan</span>${a.esc!=null?`<span class="pv-timer" data-esc="${i}">eskalasi ${String(Math.floor(a.esc/60)).padStart(2,"0")}:${String(a.esc%60).padStart(2,"0")}</span>`:""}</div>`;
+    } else {
+      body=a.done?`<div class="pv-acts"><span class="pill p-good">${a.action} · dijalankan</span></div>`:`${a.note?`<div class="m">${a.note}</div>`:""}<div class="pv-acts"><button class="pv-btn" data-act="${i}">${a.action}</button><button class="pv-btn ghost" data-act="${i}">Tandai selesai</button></div>`;
+    }
+    return `<div class="pv-al${pvSel===i?" sel":""}${closed?" done":""}" data-sel="${i}"><div class="top"><span class="pill p-${a.sev}">${a.unit}</span><span class="m">${a.time}</span></div><div class="w">${a.what}</div>${body}</div>`;
+  }).join("");
+  $("#pvaInbox").querySelectorAll("[data-sel]").forEach(el=>el.addEventListener("click",e=>{if(e.target.closest("button"))return;pvSel=+el.dataset.sel;pvPick=null;renderPvInbox();renderPvPhone();}));
+  $("#pvaInbox").querySelectorAll("[data-r]").forEach(b=>b.addEventListener("click",()=>{pvAnswer(+b.dataset.a,b.dataset.r);}));
+  $("#pvaInbox").querySelectorAll("[data-act]").forEach(b=>b.addEventListener("click",()=>{PV_ALERTS[+b.dataset.act].done=true;renderPva();}));
+}
+function pvAnswer(i,reason){
+  const a=PV_ALERTS[i]; if(!a||!a.needReason||a.answered) return;
+  a.answered=true;a.reason=reason;const k=PV_REASONS.indexOf(reason);if(k>=0)PV_COUNTS[k]++;
+  const next=PV_ALERTS.findIndex(x=>x.needReason&&!x.answered);pvSel=next>=0?next:i;pvPick=null;renderPva();
+}
+function renderPvPhone(){
+  const a=PV_ALERTS[pvSel]; const el=$("#pvaPhone");
+  const target=a&&a.needReason?a:PV_ALERTS.find(x=>x.needReason&&!x.answered)||PV_ALERTS.find(x=>x.needReason);
+  const unit=target.unit.split(" · ")[0];
+  if(target.answered){el.innerHTML=`<div class="pv-bar"><span>${unit}</span><span>${target.time}</span></div><h3>${target.what}</h3><div class="okmsg">Terkirim ke ruang kontrol<br><span style="font-weight:400">${target.reason}</span></div><p>Tercatat otomatis di log shift.</p>`;return;}
+  const opts=["Truk belum datang","Re-handling","Alat gangguan","Data salah","Cuaca","Lainnya"],map={"Truk belum datang":PV_REASONS[0],"Re-handling":PV_REASONS[1],"Alat gangguan":PV_REASONS[3],"Data salah":PV_REASONS[4],"Cuaca":PV_REASONS[5],"Lainnya":PV_REASONS[2]};
+  el.innerHTML=`<div class="pv-bar"><span>${unit}</span><span>${target.time}</span></div><h3>${target.what}</h3><p>Pilih penyebab utama. Ruang kontrol menerima jawaban seketika.</p><div class="g2">${opts.map(o=>`<button data-o="${o}" aria-pressed="${pvPick===map[o]}">${o}</button>`).join("")}</div><button class="send" ${pvPick?"":"disabled"}>Kirim ke ruang kontrol</button>`;
+  el.querySelectorAll("[data-o]").forEach(b=>b.addEventListener("click",()=>{pvSel=PV_ALERTS.indexOf(target);pvPick=map[b.dataset.o];renderPvPhone();renderPvInbox();}));
+  el.querySelector(".send").addEventListener("click",()=>{if(pvPick)pvAnswer(PV_ALERTS.indexOf(target),pvPick);});
+}
+function renderPvPareto(){
+  const total=PV_COUNTS.reduce((a,b)=>a+b,0);
+  const rows=PV_REASONS.map((r,i)=>({r,n:PV_COUNTS[i]})).sort((a,b)=>b.n-a.n);
+  let cum=0;const cumP=rows.map(x=>{cum+=x.n;return Math.round(cum/total*100);});
+  const top2=Math.round((rows[0].n+rows[1].n)/total*100);
+  $("#pvaParSub").textContent=`Dari ${fmt(total)} penyimpangan yang dijawab operator minggu ini. Batang menunjukkan jumlah per penyebab, garis menunjukkan persentase kumulatif.`;
+  $("#pvaInsight").innerHTML=`<b>${top2}% penyimpangan berasal dari dua penyebab utama</b>, yaitu ${rows[0].r.toLowerCase()} dan ${rows[1].r.toLowerCase()}. Perbaikan difokuskan pada keduanya terlebih dahulu${rows.slice(0,2).some(x=>x.r===PV_REASONS[0])?", misalnya menambah truk internal pada jam 08.00 sampai 10.00 alih-alih menambah crane":""}.`;
+  const T=chartTheme(); if(!T){$("#pvaBars").style.display="grid";return;}
+  const short={"Truk internal belum datang":["Truk","internal"],"Re-handling tumpukan":["Re-","handling"],"Feeder atau truk KTI terlambat":["Feeder/truk","KTI"],"Alat gangguan":["Alat","gangguan"],"Dokumen belum lengkap":["Dokumen"],"Cuaca":["Cuaca"]};
+  mk("chPareto",{type:"bar",data:{labels:rows.map(x=>short[x.r]),datasets:[
+    {type:"bar",label:"Jumlah penyimpangan",data:rows.map(x=>x.n),backgroundColor:rows.map((x,i)=>i<2?T.accent:"#c7c7cc"),borderRadius:6,maxBarThickness:46,yAxisID:"y",order:2},
+    {type:"line",label:"Kumulatif",data:cumP,borderColor:T.ink,backgroundColor:T.ink,borderWidth:2,pointRadius:3.5,tension:.25,yAxisID:"y2",order:1}
+  ]},options:{plugins:{legend:{labels:{boxWidth:10}},tooltip:{callbacks:{label:c=>c.dataset.yAxisID==="y2"?"Kumulatif "+c.parsed.y+"%":c.parsed.y+" penyimpangan"}}},
+    scales:{y:{beginAtZero:true,title:{display:true,text:"Jumlah"}},y2:{position:"right",min:0,max:100,grid:{display:false},ticks:{callback:v=>v+"%"}},x:{grid:{display:false},ticks:{autoSkip:false,maxRotation:0,font:{size:11}}}}},
+    plugins:[{id:"pv80",afterDatasetsDraw(c){const{ctx,chartArea:a,scales:{y2}}=c;const yy=y2.getPixelForValue(80);ctx.save();ctx.strokeStyle=T.bad;ctx.setLineDash([5,4]);ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(a.left,yy);ctx.lineTo(a.right,yy);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=T.bad;ctx.font="600 11px "+(cssv("--f-body")||"sans-serif");ctx.textAlign="right";ctx.fillText("80%",a.right-4,yy-5);ctx.restore();}}]});
+}
+function renderPvUp(){
+  const ic={sea:'<svg viewBox="0 0 24 24"><path d="M3 15h18l-2.5 4.5h-13z" fill="#fff"/><rect x="6" y="10" width="4" height="4" fill="#fff"/><rect x="11" y="10" width="4" height="4" fill="#fff"/></svg>',road:'<svg viewBox="0 0 24 24"><rect x="2" y="8" width="13" height="8" rx="1.4" fill="#fff"/><path d="M15 10.5h3.6l2.4 3V16h-6z" fill="#fff"/></svg>'};
+  const items=[];
+  FLEET.forEach(u=>{const n=node(u.asal);
+    if(u.slip>4)items.push({c:n.moda,t:`${u.id} dari ${n.nama}, ETA mundur ${u.slip} jam`,d:`${u.teu} TEU. Slot yard untuk muatan ini dialokasikan ulang agar tidak menahan blok lain.`});
+    if(u.hold)items.push({c:"road",t:`${u.id} tertahan dokumen ${u.hold} jam`,d:`${u.teu} TEU untuk direct call berikutnya. Status dokumen dibaca dari Praya.`});
+  });
+  const ok=FLEET.find(u=>u.tipe==="Feeder"&&!u.slip&&u.st==="SAILING");
+  if(ok)items.push({c:"ok",t:`${ok.id} dari ${node(ok.asal).nama} tiba sesuai rencana`,d:`${ok.teu} TEU. QCC standar disiapkan sesuai ETA ${ok.eta} jam.`});
+  $("#pvaUp").innerHTML=items.slice(0,4).map(x=>`<div class="pv-uw"><span class="ic ${x.c==="ok"?"ok":x.c}">${ic[x.c==="ok"?"sea":x.c]}</span><b>${x.t}</b><span>${x.d}</span></div>`).join("");
+}
+function renderPva(){renderPvKpis();renderPvGantt();renderPvInbox();renderPvPhone();renderPvPareto();renderPvUp();}
+function showPva(){
+  if(!pvInit){pvInit=true;pvResetAlerts();
+    $("#pvaShift").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{pvShift=b.dataset.s;$("#pvaShift").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));PV_COUNTS=PV_BASE[pvShift].slice();pvResetAlerts();renderPva();}));
+    setInterval(()=>{const sec=document.querySelector('[data-view="pva"]');if(!sec||sec.hidden)return;
+      pvPing=(pvPing+1)%31;const pe=$("#pvaPing");if(pe)pe.textContent=`Data TOS masuk ${pvPing} detik lalu`;
+      PV_ALERTS.forEach((a,i)=>{if(a.esc!=null&&!a.answered&&a.esc>0){a.esc--;const t=document.querySelector(`[data-esc="${i}"]`);if(t)t.textContent=a.esc?`eskalasi ${String(Math.floor(a.esc/60)).padStart(2,"0")}:${String(a.esc%60).padStart(2,"0")}`:"diteruskan ke supervisor";}});
+    },1000);
+  }
+  renderPva();
+}
+
 /* ================= DIGITAL TWIN ================= */
 // Selaras dengan model 3D: okupansi per posisi sandar dan QCC kompatibel 2 dari 6.
 const TW_UTIL={asis:[.38,.22,.10,.14,.06,.04],tobe:[.82,.74,.55,.62,.45,.35]};
@@ -1253,6 +1504,7 @@ const MODS={
  jaringan:{t:"Jaringan Konsolidasi",sub:"Peta",d:"Koridor laut dan darat, kinerja tiap hub",tag:()=>`${NODES.length} titik KTI`},
  partner:{t:"Partner",sub:"Kemitraan",d:"Pipeline, scorecard, dan heatmap komitmen",tag:()=>`${PARTNERS.length} partner`},
  armada:{t:"Tracker Armada",sub:"Truk & feeder",d:"Posisi unit dan risiko terhadap cut-off",tag:()=>`${FLEET.filter(u=>u.st!=="ARRIVED_MNP").length} unit aktif`},
+ pva:{t:"Plan vs Actual",sub:"Eksekusi",d:"Deteksi penyimpangan, Pareto penyebab, dan lapor satu ketukan",tag:()=>"pengganti CCTV dan telepon"},
  twin:{t:"Digital Twin",sub:"Terminal",d:"Early warning, asset planning, investment check, dan green proof",tag:()=>"4 fungsi"},
  model3d:{t:"Model 3D",sub:"Hologram",d:"Simulasi terminal MNP dalam 3D dengan mode hologram dan Digital Twin",tag:()=>"mode hologram"},
  proyeksi:{t:"Proyeksi & Direct Call",sub:"Simulasi",d:"Tiga skenario volume dan titik impas",tag:()=>`ambang ${fmt(threshold())} TEU/minggu`},
@@ -1262,12 +1514,12 @@ const MODS={
  dokumen:{t:"Dokumen & Bea Cukai",sub:"Kepatuhan",d:"Status PEB, karantina, dan SLA jalur prioritas",soon:true}
 };
 const ROLES={
- manajemen:{nama:"Manajemen MNP",grup:"Manajemen & Komersial",d:"Kinerja konsolidasi, partner, dan kelayakan direct call",mods:["ringkasan","proyeksi","partner","jaringan","armada","twin","model3d","laporan"]},
- operator:{nama:"Operator Terminal MNP",grup:"Operasi Terminal",d:"Kedatangan armada dan kesiapan cut-off",mods:["armada","twin","jaringan","ringkasan","model3d"]},
+ manajemen:{nama:"Manajemen MNP",grup:"Manajemen & Komersial",d:"Kinerja konsolidasi, partner, dan kelayakan direct call",mods:["ringkasan","proyeksi","partner","jaringan","armada","twin","pva","model3d","laporan"]},
+ operator:{nama:"Operator Terminal MNP",grup:"Operasi Terminal",d:"Kedatangan armada dan kesiapan cut-off",mods:["armada","pva","twin","jaringan","ringkasan","model3d"]},
  koordinator:{nama:"Koordinator Titik Konsolidasi",grup:"Hub Konsolidasi KTI",d:"Kinerja hub, dwell, dan unit yang berangkat",mods:["jaringan","armada","model3d","slot"]},
  partner:{nama:"Partner (Shipper & Carrier)",grup:"Shipper & Carrier",d:"Komitmen volume dan peluang direct call",mods:["partner","proyeksi","twin","model3d","slot","dokumen"]}
 };
-const MODVIEWS=["ringkasan","jaringan","partner","armada","proyeksi","twin","model3d"];
+const MODVIEWS=["ringkasan","jaringan","partner","armada","proyeksi","twin","pva","model3d"];
 let role=null; try{role=localStorage.getItem("mnp-role")}catch(e){} if(!ROLES[role]) role=null;
 
 function renderRoleCards(){
@@ -1297,6 +1549,7 @@ function show(v){
   try{localStorage.setItem("kti-tab",v)}catch(e){}
   if(v==="armada") showTracker();
   if(v==="twin") showTwin();
+  if(v==="pva") showPva();
   const f3=document.getElementById("m3dFrame"); if(v==="model3d"&&f3&&!f3.getAttribute("src")) f3.setAttribute("src","model-3d.html?holo=1");
 
   window.scrollTo(0,0);
@@ -1315,13 +1568,14 @@ $("#ctaMgmt").addEventListener("click",()=>setRole("manajemen"));
 renderCutLabel(); tick(); setInterval(tick,1000);
 readSim(); renderKPIs(); renderNodeTables(); drawMap(); renderPartners(); renderFleet(); renderAlerts(); renderRoleCards(); renderPortal();
 const TW_ANCHORS=["early-warning","asset-planning","investment-check","green-proof"];
+const PV_ANCHORS=["deteksi-penyimpangan","pareto-penyebab","lapor-satu-ketukan"];
 function goAnchor(a){setTimeout(()=>{const el=document.getElementById(a);if(!el)return;el.scrollIntoView({behavior:RM?"auto":"smooth",block:"start"});el.classList.add("flash");setTimeout(()=>el.classList.remove("flash"),1600);},250);}
-let start=(location.hash||"").slice(1); let anchor=null; if(TW_ANCHORS.includes(start)){anchor=start;start="twin";}
+let start=(location.hash||"").slice(1); let anchor=null; if(TW_ANCHORS.includes(start)){anchor=start;start="twin";} else if(PV_ANCHORS.includes(start)){anchor=start;start="pva";}
 if(!start){try{start=localStorage.getItem("kti-tab")||""}catch(e){}}
 // Link langsung: #twin, #armada, dst. Bila peran aktif tidak punya modul itu, pakai peran pertama yang punya.
 if(start&&MODVIEWS.includes(start)&&(!role||!ROLES[role].mods.includes(start))){const k=Object.keys(ROLES).find(r=>ROLES[r].mods.includes(start));if(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();}}
 show(start||"peran"); if(anchor){try{history.replaceState(null,"","#"+anchor)}catch(e){} goAnchor(anchor);}
-window.addEventListener("hashchange",()=>{let h=location.hash.slice(1);if(TW_ANCHORS.includes(h)){const a=h;h="twin";if(document.querySelector(".view:not([hidden])")?.dataset.view!=="twin"){if(!role||!ROLES[role].mods.includes("twin")){role="manajemen";try{localStorage.setItem("mnp-role",role)}catch(e){}renderPortal();}show("twin");try{history.replaceState(null,"","#"+a)}catch(e){}}goAnchor(a);return;}if(h&&h!==document.querySelector(".view:not([hidden])")?.dataset.view){if(MODVIEWS.includes(h)&&(!role||!ROLES[role].mods.includes(h))){const k=Object.keys(ROLES).find(r=>ROLES[r].mods.includes(h));if(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();}}show(h);}});
+window.addEventListener("hashchange",()=>{let h=location.hash.slice(1);if(PV_ANCHORS.includes(h)){const a=h;if(document.querySelector(".view:not([hidden])")?.dataset.view!=="pva"){if(!role||!ROLES[role].mods.includes("pva")){role="operator";try{localStorage.setItem("mnp-role",role)}catch(e){}renderPortal();}show("pva");try{history.replaceState(null,"","#"+a)}catch(e){}}goAnchor(a);return;}if(TW_ANCHORS.includes(h)){const a=h;h="twin";if(document.querySelector(".view:not([hidden])")?.dataset.view!=="twin"){if(!role||!ROLES[role].mods.includes("twin")){role="manajemen";try{localStorage.setItem("mnp-role",role)}catch(e){}renderPortal();}show("twin");try{history.replaceState(null,"","#"+a)}catch(e){}}goAnchor(a);return;}if(h&&h!==document.querySelector(".view:not([hidden])")?.dataset.view){if(MODVIEWS.includes(h)&&(!role||!ROLES[role].mods.includes(h))){const k=Object.keys(ROLES).find(r=>ROLES[r].mods.includes(h));if(k){role=k;try{localStorage.setItem("mnp-role",k)}catch(e){}renderPortal();}}show(h);}});
 drawAll();
 })();
 </script>
